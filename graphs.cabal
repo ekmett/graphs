@@ -9,8 +9,8 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     experimental
 homepage:      http://github.com/ekmett/graphs
 copyright:     Copyright (C) 2011 Edward A. Kmett
-synopsis:      Graphs
-description:   Graphs
+synopsis:      A simple monadic graph library
+description:   A simple monadic graph library
 build-type:    Simple
 
 source-repository head
@@ -38,6 +38,6 @@ library
     Data.Graph.Class.Incidence
     Data.Graph.Class.Bidirectional
     Data.Graph.PropertyMap
-    Data.Graph.Algorithm.Dfs
+    Data.Graph.Algorithm.DepthFirstSearch
 
   ghc-options: -Wall 

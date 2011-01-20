@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Graph.Algorithm.Dfs
+-- Module      :  Data.Graph.Algorithm.DepthFirstSearch
 -- Copyright   :  (C) 2011 Edward Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
@@ -12,7 +12,7 @@
 -- Depth-first search
 ----------------------------------------------------------------------------
 
-module Data.Graph.Algorithm.Dfs 
+module Data.Graph.Algorithm.DepthFirstSearch
   ( dfs, Dfs(..)
   ) where
 

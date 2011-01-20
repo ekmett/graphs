@@ -35,6 +35,7 @@ library
     Data.Graph.Class.Adjacency.List
     Data.Graph.Class.Adjacency.Matrix
     Data.Graph.Class.Bidirectional
+    Data.Graph.Dual
     Data.Graph.PropertyMap
 
   ghc-options: -Wall 

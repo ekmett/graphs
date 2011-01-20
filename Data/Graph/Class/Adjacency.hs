@@ -23,6 +23,7 @@ import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class
+import qualified Data.Graph.Pure.Class.Adjacency as Pure
 
 class Graph g => AdjacencyGraph g where
   adjacentVertices :: Vertex g -> g [Vertex g]
@@ -38,3 +39,6 @@ instance (AdjacencyGraph g, Monoid m) => AdjacencyGraph (Strict.WriterT m g) whe
 
 instance (AdjacencyGraph g, Monoid m) => AdjacencyGraph (Lazy.WriterT m g) where
   adjacentVertices = lift . adjacentVertices
+
+instance Pure.AdjacencyGraph g => AdjacencyGraph ((->) g) where
+  adjacentVertices = Pure.adjacentVertices

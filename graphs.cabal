@@ -20,6 +20,7 @@ source-repository head
 library
   build-depends: 
     base >= 4 && < 4.4,
+    array >= 0.3 && < 0.5,
     comonad >= 0.6 && < 0.8,
     monad-st >= 0.1 && < 0.3,
     data-default >= 0.2 && < 0.3,
@@ -30,9 +31,19 @@ library
   exposed-modules:
     Data.Graph.Class
     Data.Graph.Class.Adjacency
+    Data.Graph.Class.AdjacencyMatrix
+    Data.Graph.Class.Edged
     Data.Graph.Class.Incidence
     Data.Graph.Class.Bidirectional
     Data.Graph.PropertyMap
+    Data.Graph.Pure.Adjacency.List
+    Data.Graph.Pure.Adjacency.Matrix
+    Data.Graph.Pure.Class
+    Data.Graph.Pure.Class.Adjacency
+    Data.Graph.Pure.Class.AdjacencyMatrix
+    Data.Graph.Pure.Class.Edged
+    Data.Graph.Pure.Class.Incidence
+    Data.Graph.Pure.Class.Bidirectional
     Data.Graph.Algorithm.Dfs
 
   ghc-options: -Wall 

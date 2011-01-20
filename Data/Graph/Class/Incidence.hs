@@ -25,7 +25,7 @@ import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad
 import Control.Monad.Trans.Class
 import Data.Monoid
-import Data.Graph.Class.Adjacency
+import Data.Graph.Class.Adjacency (AdjacencyGraph(..))
 import Data.Graph.Class.Edged
 
 

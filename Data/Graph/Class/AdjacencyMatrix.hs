@@ -22,7 +22,8 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
-import Data.Graph.Class
+import Data.Graph.Class.Edged
+
 
 class EdgedGraph g => AdjacencyMatrix g where
   edge :: Vertex g -> Vertex g -> g (Maybe (Edge g))

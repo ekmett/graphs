@@ -45,7 +45,7 @@ instance Ord i => Graph (AdjacencyMatrix arr i) i (i, i) where
   vertexMap = pure . propertyMap
   edgeMap = pure . propertyMap
 
-instance (IArray arr Bool, Ix i, Ord i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) i (i, i) where
+instance (IArray arr Bool, Ix i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) i (i, i) where
   edge i j = AdjacencyMatrix $ \a ->
     if inRange (bounds a) ix && (a ! ix) 
     then Just ix

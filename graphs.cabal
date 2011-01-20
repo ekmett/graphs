@@ -1,0 +1,38 @@
+name:          graphs
+category:      Data Structures
+version:       0.1
+license:       BSD3
+cabal-version: >= 1.6
+license-file:  LICENSE
+author:        Edward A. Kmett
+maintainer:    Edward A. Kmett <ekmett@gmail.com>
+stability:     experimental
+homepage:      http://github.com/ekmett/graphs
+copyright:     Copyright (C) 2011 Edward A. Kmett
+synopsis:      Graphs
+description:   Graphs
+build-type:    Simple
+
+source-repository head
+  type: git
+  location: git://github.com/ekmett/graphs.git
+
+library
+  build-depends: 
+    base >= 4 && < 4.4,
+    comonad >= 0.6 && < 0.8,
+    monad-st >= 0.1 && < 0.3,
+    data-default >= 0.2 && < 0.3,
+    transformers >= 0.2.2 && < 0.3,
+    containers >= 0.3 && < 0.5,
+    semigroups >= 0.3.4 && < 0.5
+
+  exposed-modules:
+    Data.Graph.Class
+    Data.Graph.Class.Adjacency
+    Data.Graph.Class.Incidence
+    Data.Graph.Class.Bidirectional
+    Data.Graph.PropertyMap
+    Data.Graph.Algorithm.Dfs
+
+  ghc-options: -Wall 

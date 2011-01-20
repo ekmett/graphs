@@ -24,6 +24,7 @@ library
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,
     containers >= 0.3 && < 0.5,
+    void >= 0.1 && < 0.2,
     heaps >= 0.2 && < 0.3
 
   exposed-modules:
@@ -36,6 +37,7 @@ library
     Data.Graph.Class.Adjacency.Matrix
     Data.Graph.Class.Bidirectional
     Data.Graph.Dual
+    Data.Graph.Empty
     Data.Graph.PropertyMap
 
   ghc-options: -Wall 

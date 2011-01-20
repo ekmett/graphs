@@ -24,7 +24,6 @@ import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class.Incidence
-import qualified Data.Graph.Pure.Class.Bidirectional as Pure
 
 class IncidenceGraph g => BidirectionalGraph g where
   -- /O(n)/
@@ -62,9 +61,3 @@ instance (BidirectionalGraph g, Monoid m) => BidirectionalGraph (Lazy.WriterT m 
   inDegree = lift . inDegree
   incidentEdges = lift . incidentEdges
   degree = lift . degree
-
-instance Pure.BidirectionalGraph g => BidirectionalGraph ((->) g) where
-  inEdges = Pure.inEdges
-  inDegree = Pure.inDegree
-  incidentEdges = Pure.incidentEdges
-  degree = Pure.degree

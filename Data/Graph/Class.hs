@@ -24,7 +24,6 @@ import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.PropertyMap
-import qualified Data.Graph.Pure.Class as Pure
 
 type VertexMap g = PropertyMap g (Vertex g) 
 
@@ -47,7 +46,3 @@ instance (Graph g, Monoid m) => Graph (Strict.WriterT m g) where
 instance (Graph g, Monoid m) => Graph (Lazy.WriterT m g) where
   type Vertex (Lazy.WriterT m g) = Vertex g
   vertexMap = lift . liftM liftPropertyMap . vertexMap
-
-instance Pure.Graph g => Graph ((->)g) where
-  type Vertex ((->)g) = Pure.Vertex g
-  vertexMap = Pure.vertexMap

@@ -29,6 +29,8 @@ library
     semigroups >= 0.3.4 && < 0.5
 
   exposed-modules:
+    Data.Graph.Adjacency.List
+    Data.Graph.Adjacency.Matrix
     Data.Graph.Class
     Data.Graph.Class.Adjacency
     Data.Graph.Class.AdjacencyMatrix
@@ -36,14 +38,6 @@ library
     Data.Graph.Class.Incidence
     Data.Graph.Class.Bidirectional
     Data.Graph.PropertyMap
-    Data.Graph.Pure.Adjacency.List
-    Data.Graph.Pure.Adjacency.Matrix
-    Data.Graph.Pure.Class
-    Data.Graph.Pure.Class.Adjacency
-    Data.Graph.Pure.Class.AdjacencyMatrix
-    Data.Graph.Pure.Class.Edged
-    Data.Graph.Pure.Class.Incidence
-    Data.Graph.Pure.Class.Bidirectional
     Data.Graph.Algorithm.Dfs
 
   ghc-options: -Wall 

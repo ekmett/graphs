@@ -22,7 +22,6 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Data.Monoid
 import Data.Graph.Class
-import qualified Data.Graph.Pure.Class.Edged as Pure
 
 class (Graph g, Eq (Edge g)) => EdgedGraph g where
   type Edge g
@@ -38,6 +37,3 @@ instance (EdgedGraph g, Monoid m) => EdgedGraph (Strict.WriterT m g) where
 
 instance (EdgedGraph g, Monoid m) => EdgedGraph (Lazy.WriterT m g) where
   type Edge (Lazy.WriterT m g) = Edge g
-
-instance Pure.EdgedGraph g => EdgedGraph ((->) g) where
-  type Edge ((->) g) = Pure.Edge g

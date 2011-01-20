@@ -13,7 +13,7 @@
 
 module Data.Graph.Class.Bidirectional 
   ( BidirectionalGraph(..)
-  , module Data.Graph.Class.Incidence
+  , module Data.Graph.Class.Adjacency
   ) where
 
 import Control.Monad
@@ -23,12 +23,12 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
-import Data.Graph.Class.Incidence
+import Data.Graph.Class.Adjacency
 
-class IncidenceGraph g => BidirectionalGraph g where
-  -- /O(n)/
+class AdjacencyGraph g => BidirectionalGraph g where
+  -- /O(e)/
   inEdges :: Vertex g -> g [Edge g]
-  -- /O(n)/
+  -- /O(e)/
   inDegree :: Vertex g -> g Int
   inDegree v = length `liftM` inEdges v
   

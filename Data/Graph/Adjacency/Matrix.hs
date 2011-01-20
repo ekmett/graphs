@@ -43,10 +43,8 @@ instance Monad (Matrix arr i) where
 
 instance Ord i => Graph (Matrix arr i) where
   type Vertex (Matrix arr i) = i
-  vertexMap = propertyMap
-
-instance Ord i => EdgedGraph (Matrix arr i) where
   type Edge (Matrix arr i) = (i, i)
+  vertexMap = propertyMap
 
 instance (IArray arr Bool, Ix i, Ord i) => AdjacencyMatrix (Matrix arr i) where
   edge i j = Matrix $ \a ->

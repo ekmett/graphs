@@ -22,7 +22,6 @@ import Data.Array
 import Data.Graph.PropertyMap
 import Data.Graph.Class
 import Data.Graph.Class.Adjacency
-import Data.Graph.Class.Incidence
 
 newtype Table i a = Table { getTable :: Array i [i] -> a }  
 
@@ -43,17 +42,13 @@ instance Monad (Table i) where
 
 instance Ord i => Graph (Table i) where
   type Vertex (Table i) = i
+  type Edge (Table i) = (i, i)
   vertexMap = propertyMap
 
 instance (Ix i, Ord i) => AdjacencyGraph (Table i) where
   adjacentVertices v = Table $ \g -> if inRange (bounds g) v 
                                      then g ! v 
                                      else []
-
-instance Ord i => EdgedGraph (Table i) where
-  type Edge (Table i) = (i, i)
-
-instance (Ix i, Ord i) => IncidenceGraph (Table i) where
   source (a, _) = pure a
   target (_, b) = pure b
-  outEdges v = map ((,) v) <$> adjacentVertices v
+  outEdges = defaultOutEdges

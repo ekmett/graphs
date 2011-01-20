@@ -13,7 +13,7 @@
 
 module Data.Graph.Class.AdjacencyMatrix 
   ( AdjacencyMatrix(..)
-  , module Data.Graph.Class.Edged
+  , module Data.Graph.Class
   ) where
 
 import qualified Control.Monad.Trans.State.Strict as Strict
@@ -22,9 +22,9 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
-import Data.Graph.Class.Edged
+import Data.Graph.Class
 
-class EdgedGraph g => AdjacencyMatrix g where
+class Graph g => AdjacencyMatrix g where
   edge :: Vertex g -> Vertex g -> g (Maybe (Edge g))
 
 instance AdjacencyMatrix g => AdjacencyMatrix (Strict.StateT s g) where

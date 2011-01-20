@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, DeriveFunctor #-}
+{-# LANGUAGE MultiParamTypeClasses, DeriveFunctor #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.DepthFirstSearch

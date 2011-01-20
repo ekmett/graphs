@@ -29,11 +29,12 @@ library
   exposed-modules:
     Data.Graph.Adjacency.List
     Data.Graph.Adjacency.Matrix
+    Data.Graph.Algorithm.DepthFirstSearch
+    Data.Graph.Algorithm.BreadthFirstSearch
     Data.Graph.Class
     Data.Graph.Class.Adjacency.List
     Data.Graph.Class.Adjacency.Matrix
     Data.Graph.Class.Bidirectional
     Data.Graph.PropertyMap
-    Data.Graph.Algorithm.DepthFirstSearch
 
   ghc-options: -Wall 

@@ -23,7 +23,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.Trans.State.Strict
 import Data.Monoid
 import Data.Graph.Class
-import Data.Graph.Class.Adjacency
+import Data.Graph.Class.Adjacency.List
 import Data.Graph.PropertyMap
 
 data Color = White | Gray | Black deriving (Eq,Ord,Show,Read)
@@ -54,7 +54,7 @@ putS k v = do
   put m'
 
 -- TODO: CPS transform?
-dfs :: (AdjacencyGraph g, Monoid m) => Dfs g m -> Vertex g -> g m
+dfs :: (AdjacencyListGraph g, Monoid m) => Dfs g m -> Vertex g -> g m
 dfs vis v0 = do
   m <- vertexMap White 
   evalStateT (go v0) m where

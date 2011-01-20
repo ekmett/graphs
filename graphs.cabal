@@ -29,8 +29,8 @@ library
     Data.Graph.Adjacency.List
     Data.Graph.Adjacency.Matrix
     Data.Graph.Class
-    Data.Graph.Class.Adjacency
-    Data.Graph.Class.AdjacencyMatrix
+    Data.Graph.Class.Adjacency.List
+    Data.Graph.Class.Adjacency.Matrix
     Data.Graph.Class.Bidirectional
     Data.Graph.PropertyMap
     Data.Graph.Algorithm.DepthFirstSearch

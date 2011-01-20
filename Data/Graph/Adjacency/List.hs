@@ -12,7 +12,7 @@
 ----------------------------------------------------------------------------
 
 module Data.Graph.Adjacency.List
-  ( Table(..)
+  ( AdjacencyList(..)
   , ask
   ) where
 
@@ -21,32 +21,32 @@ import Data.Ix
 import Data.Array
 import Data.Graph.PropertyMap
 import Data.Graph.Class
-import Data.Graph.Class.Adjacency
+import Data.Graph.Class.Adjacency.List
 
-newtype Table i a = Table { getTable :: Array i [i] -> a }  
+newtype AdjacencyList i a = AdjacencyList { runAdjacencyList :: Array i [i] -> a }  
 
-ask :: Table i (Array i [i])
-ask = Table id
+ask :: AdjacencyList i (Array i [i])
+ask = AdjacencyList id
 
-instance Functor (Table i) where
-  fmap f (Table g) = Table (f . g)
+instance Functor (AdjacencyList i) where
+  fmap f (AdjacencyList g) = AdjacencyList (f . g)
   b <$ _ = pure b
 
-instance Applicative (Table i) where
-  pure = Table . const
-  Table f <*> Table a = Table $ \t -> f t (a t)
+instance Applicative (AdjacencyList i) where
+  pure = AdjacencyList . const
+  AdjacencyList f <*> AdjacencyList a = AdjacencyList $ \t -> f t (a t)
 
-instance Monad (Table i) where
-  return = Table . const
-  Table f >>= k = Table $ \t -> getTable (k (f t)) t
+instance Monad (AdjacencyList i) where
+  return = AdjacencyList . const
+  AdjacencyList f >>= k = AdjacencyList $ \t -> runAdjacencyList (k (f t)) t
 
-instance Ord i => Graph (Table i) where
-  type Vertex (Table i) = i
-  type Edge (Table i) = (i, i)
+instance Ord i => Graph (AdjacencyList i) where
+  type Vertex (AdjacencyList i) = i
+  type Edge (AdjacencyList i) = (i, i)
   vertexMap = propertyMap
 
-instance (Ix i, Ord i) => AdjacencyGraph (Table i) where
-  adjacentVertices v = Table $ \g -> if inRange (bounds g) v 
+instance (Ix i, Ord i) => AdjacencyListGraph (AdjacencyList i) where
+  adjacentVertices v = AdjacencyList $ \g -> if inRange (bounds g) v 
                                      then g ! v 
                                      else []
   source (a, _) = pure a

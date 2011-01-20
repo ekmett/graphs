@@ -6,7 +6,7 @@
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
--- Stability   :  provisional
+-- Stability   :  experimental
 -- Portability :  type families
 --
 ----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ instance Monad (AdjacencyList i) where
 instance Ord i => Graph (AdjacencyList i) where
   type Vertex (AdjacencyList i) = i
   type Edge (AdjacencyList i) = (i, i)
-  vertexMap = propertyMap
+  vertexMap = pure . propertyMap
 
 instance (Ix i, Ord i) => AdjacencyListGraph (AdjacencyList i) where
   adjacentVertices v = AdjacencyList $ \g -> if inRange (bounds g) v 

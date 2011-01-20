@@ -34,16 +34,16 @@ modifyP m k f = do
   putP m k (f a)
 
 -- A pure IntMap-backed vertex map
-intPropertyMap :: Monad m => v -> m (PropertyMap m Int v)
-intPropertyMap v0 = return $ go v0 IntMap.empty where
+intPropertyMap :: Monad m => v -> PropertyMap m Int v
+intPropertyMap v0 = go v0 IntMap.empty where
   go v m = PropertyMap 
     { getP = \k -> return $ maybe v id (IntMap.lookup k m)
     , putP = \k v' -> return $ go v (IntMap.insert k v' m)
     }
 
 -- A pure Map-backed vertex map
-propertyMap :: (Monad m, Ord k) => v -> m (PropertyMap m k v)
-propertyMap v0 = return $ go v0 Map.empty where
+propertyMap :: (Monad m, Ord k) => v -> PropertyMap m k v
+propertyMap v0 = go v0 Map.empty where
   go v m = PropertyMap 
     { getP = \k -> return $ maybe v id (Map.lookup k m)
     , putP = \k v' -> return $ go v (Map.insert k v' m)

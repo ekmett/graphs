@@ -6,8 +6,8 @@
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
--- Stability   :  provisional
--- Portability :  MPTCs, fundeps, type families
+-- Stability   :  experimental
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 

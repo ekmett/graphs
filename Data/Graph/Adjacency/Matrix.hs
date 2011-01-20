@@ -6,7 +6,7 @@
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
--- Stability   :  provisional
+-- Stability   :  experimental
 -- Portability :  type families
 --
 ----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ instance Monad (AdjacencyMatrix arr i) where
 instance Ord i => Graph (AdjacencyMatrix arr i) where
   type Vertex (AdjacencyMatrix arr i) = i
   type Edge (AdjacencyMatrix arr i) = (i, i)
-  vertexMap = propertyMap
+  vertexMap = pure . propertyMap
 
 instance (IArray arr Bool, Ix i, Ord i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) where
   edge i j = AdjacencyMatrix $ \a ->

@@ -13,6 +13,7 @@
 
 module Data.Graph.Adjacency.Matrix
   ( Matrix(..)
+  , ask
   ) where
 
 import Control.Applicative
@@ -24,6 +25,9 @@ import Data.Graph.Class
 import Data.Graph.Class.AdjacencyMatrix
 
 newtype Matrix arr i a = Matrix { getMatrix :: arr (i,i) Bool -> a } 
+
+ask :: Matrix arr i (arr (i, i) Bool)
+ask = Matrix id
 
 instance Functor (Matrix arr i) where
   fmap f (Matrix g) = Matrix (f . g)

@@ -44,6 +44,7 @@ instance Ord i => Graph (AdjacencyList i) where
   type Vertex (AdjacencyList i) = i
   type Edge (AdjacencyList i) = (i, i)
   vertexMap = pure . propertyMap
+  edgeMap = pure . propertyMap
 
 instance (Ix i, Ord i) => AdjacencyListGraph (AdjacencyList i) where
   adjacentVertices v = AdjacencyList $ \g -> if inRange (bounds g) v 

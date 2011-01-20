@@ -45,6 +45,7 @@ instance Ord i => Graph (AdjacencyMatrix arr i) where
   type Vertex (AdjacencyMatrix arr i) = i
   type Edge (AdjacencyMatrix arr i) = (i, i)
   vertexMap = pure . propertyMap
+  edgeMap = pure . propertyMap
 
 instance (IArray arr Bool, Ix i, Ord i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) where
   edge i j = AdjacencyMatrix $ \a ->

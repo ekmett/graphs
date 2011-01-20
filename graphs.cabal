@@ -23,7 +23,8 @@ library
     array >= 0.3 && < 0.5,
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,
-    containers >= 0.3 && < 0.5
+    containers >= 0.3 && < 0.5,
+    heaps >= 0.2 && < 0.3
 
   exposed-modules:
     Data.Graph.Adjacency.List

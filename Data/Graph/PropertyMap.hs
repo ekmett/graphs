@@ -8,6 +8,8 @@
 -- Stability   :  experimental
 -- Portability :  portable
 --
+-- Total transient monadic maps, used to track information about vertices
+-- and edges in a graph
 ----------------------------------------------------------------------------
 
 module Data.Graph.PropertyMap 
@@ -65,4 +67,3 @@ stAdjVertexMap v0 = do
       , putP = \k v -> writeSTArray arr k v >> return r
       } 
 -}
-      

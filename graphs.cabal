@@ -22,7 +22,7 @@ library
     base >= 4 && < 4.4,
     array >= 0.3 && < 0.5,
     comonad >= 0.6 && < 0.8,
-    monad-st >= 0.1 && < 0.3,
+    monad-st >= 0.2 && < 0.3,
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,
     containers >= 0.3 && < 0.5,

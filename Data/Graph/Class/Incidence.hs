@@ -27,6 +27,7 @@ defaultAdjacentVertices :: IncidenceGraph g => Vertex g -> g [Vertex g]
 defaultAdjacentVertices = outEdges >=> mapM target
 
 class AdjacencyGraph g => IncidenceGraph g where
+  type Edge g
   -- /O(1)/
   source :: Edge g -> g (Vertex g)
   -- /O(1)/
@@ -38,26 +39,29 @@ class AdjacencyGraph g => IncidenceGraph g where
   outDegree v = liftM length (outEdges v)
 
 instance IncidenceGraph g => IncidenceGraph (Strict.StateT s g) where
+  type Edge (Strict.StateT s g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
 instance IncidenceGraph g => IncidenceGraph (Lazy.StateT s g) where
+  type Edge (Lazy.StateT s g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
 instance (IncidenceGraph g, Monoid m) => IncidenceGraph (Strict.WriterT m g) where
+  type Edge (Strict.WriterT m g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
 instance (IncidenceGraph g, Monoid m) => IncidenceGraph (Lazy.WriterT m g) where
+  type Edge (Lazy.WriterT m g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
-

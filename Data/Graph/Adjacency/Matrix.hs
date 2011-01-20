@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Adjacency.Matrix
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  type families
+-- Portability :  MPTCs, fundeps
 --
 ----------------------------------------------------------------------------
 
@@ -41,13 +41,11 @@ instance Monad (AdjacencyMatrix arr i) where
   return = AdjacencyMatrix . const
   AdjacencyMatrix f >>= k = AdjacencyMatrix $ \t -> runAdjacencyMatrix (k (f t)) t
 
-instance Ord i => Graph (AdjacencyMatrix arr i) where
-  type Vertex (AdjacencyMatrix arr i) = i
-  type Edge (AdjacencyMatrix arr i) = (i, i)
+instance Ord i => Graph (AdjacencyMatrix arr i) i (i, i) where
   vertexMap = pure . propertyMap
   edgeMap = pure . propertyMap
 
-instance (IArray arr Bool, Ix i, Ord i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) where
+instance (IArray arr Bool, Ix i, Ord i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) i (i, i) where
   edge i j = AdjacencyMatrix $ \a ->
     if inRange (bounds a) ix && (a ! ix) 
     then Just ix

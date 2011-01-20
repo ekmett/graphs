@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, UndecidableInstances, FlexibleInstances, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class.Adjacency.Matrix
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  type families
+-- Portability :  MPTCs, fundeps
 --
 ----------------------------------------------------------------------------
 
@@ -24,18 +24,17 @@ import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class
 
-class Graph g => AdjacencyMatrixGraph g where
-  edge :: Vertex g -> Vertex g -> g (Maybe (Edge g))
+class Graph g v e => AdjacencyMatrixGraph g v e | g -> v e where
+  edge :: v -> v -> g (Maybe e)
 
-instance AdjacencyMatrixGraph g => AdjacencyMatrixGraph (Strict.StateT s g) where
+instance AdjacencyMatrixGraph g v e => AdjacencyMatrixGraph (Strict.StateT s g) v e where
   edge a b = lift (edge a b)
 
-instance AdjacencyMatrixGraph g => AdjacencyMatrixGraph (Lazy.StateT s g) where
+instance AdjacencyMatrixGraph g v e => AdjacencyMatrixGraph (Lazy.StateT s g) v e where
   edge a b = lift (edge a b)
 
-instance (AdjacencyMatrixGraph g, Monoid m) => AdjacencyMatrixGraph (Strict.WriterT m g) where
+instance (AdjacencyMatrixGraph g v e, Monoid m) => AdjacencyMatrixGraph (Strict.WriterT m g) v e where
   edge a b = lift (edge a b)
 
-instance (AdjacencyMatrixGraph g, Monoid m) => AdjacencyMatrixGraph (Lazy.WriterT m g) where
+instance (AdjacencyMatrixGraph g v e, Monoid m) => AdjacencyMatrixGraph (Lazy.WriterT m g) v e where
   edge a b = lift (edge a b)
-

@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Adjacency.List
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  type families
+-- Portability :  MPTCs, fundeps
 --
 ----------------------------------------------------------------------------
 
@@ -40,13 +40,11 @@ instance Monad (AdjacencyList i) where
   return = AdjacencyList . const
   AdjacencyList f >>= k = AdjacencyList $ \t -> runAdjacencyList (k (f t)) t
 
-instance Ord i => Graph (AdjacencyList i) where
-  type Vertex (AdjacencyList i) = i
-  type Edge (AdjacencyList i) = (i, i)
+instance Ord i => Graph (AdjacencyList i) i (i, i) where
   vertexMap = pure . propertyMap
   edgeMap = pure . propertyMap
 
-instance (Ix i, Ord i) => AdjacencyListGraph (AdjacencyList i) where
+instance (Ix i, Ord i) => AdjacencyListGraph (AdjacencyList i) i (i, i) where
   adjacentVertices v = AdjacencyList $ \g -> if inRange (bounds g) v 
                                      then g ! v 
                                      else []

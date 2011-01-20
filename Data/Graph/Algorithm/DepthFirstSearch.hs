@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, DeriveFunctor #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.DepthFirstSearch
@@ -28,14 +28,14 @@ import Data.Graph.PropertyMap
 
 data Color = White | Gray | Black deriving (Eq,Ord,Show,Read)
 
-data Dfs g m = Dfs 
-  { enterVertex   :: Vertex g -> m             -- called the first time a vertex is discovered
-  , backEdge      :: Vertex g -> Vertex g -> m -- called when we encounter a back edge to a vertex we're still processing
-  , exitVertex    :: Vertex g -> m             -- called once we have processed all descendants of a vertex
-  , crossEdge     :: Vertex g -> Vertex g -> m -- called when we encounter a cross edge to a vertex we've already finished
-  }
+data Dfs v e m = Dfs 
+  { enterVertex   :: v -> m -- called the first time a vertex is discovered
+  , backEdge      :: e -> m -- called when we encounter a back edge to a vertex we're still processing
+  , exitVertex    :: v -> m -- called once we have processed all descendants of a vertex
+  , crossEdge     :: e -> m -- called when we encounter a cross edge to a vertex we've already finished
+  } deriving (Functor)
 
-instance Monoid m => Default (Dfs g m) where
+instance Monoid m => Default (Dfs v e m) where
   def = Dfs 
     (const mempty)
     (const mempty)
@@ -54,20 +54,21 @@ putS k v = do
   put m'
 
 -- TODO: CPS transform?
-dfs :: (AdjacencyListGraph g, Monoid m) => Dfs g m -> Vertex g -> g m
+dfs :: (AdjacencyListGraph g v e, Monoid m) => Dfs v e m -> v -> g m
 dfs vis v0 = do
   m <- vertexMap White 
   evalStateT (go v0) m where
   go v = do
     putS v Gray
-    adjs <- lift $ adjacentVertices v 
+    adjs <- lift $ outEdges v 
     result <- foldrM 
-      (\v' m -> do 
+      (\e m -> do 
+        v' <- target e
         color <- getS v'
         liftM (`mappend` m) $ case color of
           White -> go v'
-          Gray  -> return $ backEdge vis v v'
-          Black -> return $ crossEdge vis v v'
+          Gray  -> return $ backEdge vis e
+          Black -> return $ crossEdge vis e
       ) 
       mempty 
       adjs

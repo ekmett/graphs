@@ -27,7 +27,7 @@ import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class.Adjacency (AdjacencyGraph(..))
 import Data.Graph.Class.Edged
-
+import qualified Data.Graph.Pure.Class.Incidence as Pure
 
 defaultAdjacentVertices :: IncidenceGraph g => Vertex g -> g [Vertex g]
 defaultAdjacentVertices = outEdges >=> mapM target
@@ -66,3 +66,9 @@ instance (IncidenceGraph g, Monoid m) => IncidenceGraph (Lazy.WriterT m g) where
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
+
+instance Pure.IncidenceGraph g => IncidenceGraph ((->) g) where
+  source = Pure.source
+  target = Pure.target
+  outEdges = Pure.outEdges
+  outDegree = Pure.outDegree

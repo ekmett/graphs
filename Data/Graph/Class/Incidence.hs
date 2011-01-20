@@ -7,11 +7,16 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MTPCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Class.Incidence where
+module Data.Graph.Class.Incidence 
+  ( IncidenceGraph(..)
+  , defaultAdjacentVertices
+  , module Data.Graph.Class.Edged
+  , module Data.Graph.Class.Adjacency
+  ) where
 
 import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.State.Lazy as Lazy
@@ -21,13 +26,13 @@ import Control.Monad
 import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class.Adjacency
-import Data.Graph.Class
+import Data.Graph.Class.Edged
+
 
 defaultAdjacentVertices :: IncidenceGraph g => Vertex g -> g [Vertex g]
 defaultAdjacentVertices = outEdges >=> mapM target
 
-class AdjacencyGraph g => IncidenceGraph g where
-  type Edge g
+class (EdgedGraph g, AdjacencyGraph g) => IncidenceGraph g where
   -- /O(1)/
   source :: Edge g -> g (Vertex g)
   -- /O(1)/
@@ -39,28 +44,24 @@ class AdjacencyGraph g => IncidenceGraph g where
   outDegree v = liftM length (outEdges v)
 
 instance IncidenceGraph g => IncidenceGraph (Strict.StateT s g) where
-  type Edge (Strict.StateT s g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
 instance IncidenceGraph g => IncidenceGraph (Lazy.StateT s g) where
-  type Edge (Lazy.StateT s g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
 instance (IncidenceGraph g, Monoid m) => IncidenceGraph (Strict.WriterT m g) where
-  type Edge (Strict.WriterT m g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
 instance (IncidenceGraph g, Monoid m) => IncidenceGraph (Lazy.WriterT m g) where
-  type Edge (Lazy.WriterT m g) = Edge g
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges

@@ -6,12 +6,15 @@
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
--- Stability   :  provisional
--- Portability :  portable
+-- Stability   :  experimental
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Class.Bidirectional where
+module Data.Graph.Class.Bidirectional 
+  ( BidirectionalGraph(..)
+  , module Data.Graph.Class.Incidence
+  ) where
 
 import Control.Monad
 import qualified Control.Monad.Trans.State.Strict as Strict
@@ -20,7 +23,6 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
-import Data.Graph.Class
 import Data.Graph.Class.Incidence
 
 class IncidenceGraph g => BidirectionalGraph g where

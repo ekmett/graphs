@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Graph.Class.Adjacency
+-- Module      :  Data.Graph.Class.AdjacencyMatrix
 -- Copyright   :  (C) 2011 Edward Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
@@ -11,9 +11,9 @@
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Class.Adjacency 
-  ( AdjacencyGraph(..)
-  , module Data.Graph.Class
+module Data.Graph.Class.AdjacencyMatrix 
+  ( AdjacencyMatrix(..)
+  , module Data.Graph.Class.Edged
   ) where
 
 import qualified Control.Monad.Trans.State.Strict as Strict
@@ -24,17 +24,17 @@ import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class
 
-class Graph g => AdjacencyGraph g where
-  adjacentVertices :: Vertex g -> g [Vertex g]
+class EdgedGraph g => AdjacencyMatrix g where
+  edge :: Vertex g -> Vertex g -> g (Maybe (Edge g))
 
-instance AdjacencyGraph g => AdjacencyGraph (Strict.StateT s g) where
-  adjacentVertices = lift . adjacentVertices
+instance AdjacencyMatrix g => AdjacencyMatrix (Strict.StateT s g) where
+  edge a b = lift (edge a b)
 
-instance AdjacencyGraph g => AdjacencyGraph (Lazy.StateT s g) where
-  adjacentVertices = lift . adjacentVertices
+instance AdjacencyMatrix g => AdjacencyMatrix (Lazy.StateT s g) where
+  edge a b = lift (edge a b)
 
-instance (AdjacencyGraph g, Monoid m) => AdjacencyGraph (Strict.WriterT m g) where
-  adjacentVertices = lift . adjacentVertices
+instance (AdjacencyMatrix g, Monoid m) => AdjacencyMatrix (Strict.WriterT m g) where
+  edge a b = lift (edge a b)
 
-instance (AdjacencyGraph g, Monoid m) => AdjacencyGraph (Lazy.WriterT m g) where
-  adjacentVertices = lift . adjacentVertices
+instance (AdjacencyMatrix g, Monoid m) => AdjacencyMatrix (Lazy.WriterT m g) where
+  edge a b = lift (edge a b)

@@ -53,3 +53,5 @@ instance (IArray arr Bool, Ix i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i)
     then Just ix
     else Nothing
     where ix = (i, j)
+
+

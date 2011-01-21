@@ -20,9 +20,16 @@ import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.State.Lazy as Lazy
 import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
+import qualified Control.Monad.Trans.RWS.Strict as Strict
+import qualified Control.Monad.Trans.RWS.Lazy as Lazy
+import Control.Monad.Trans.Identity
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.Error
 import Control.Monad.Trans.Class
+import Control.Monad.Trans.Reader
 import Data.Monoid
 import Data.Graph.Class
+import Data.Functor.Identity
 
 class Graph g => VertexEnumerableGraph g where
   -- | /O(v)/
@@ -40,3 +47,23 @@ instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Strict.Wr
 instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Lazy.WriterT m g) where
   vertices = lift vertices
 
+instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Strict.RWST r m s g) where
+  vertices = lift vertices
+  
+instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Lazy.RWST r m s g) where
+  vertices = lift vertices
+
+instance VertexEnumerableGraph g => VertexEnumerableGraph (MaybeT g) where
+  vertices = lift vertices
+
+instance VertexEnumerableGraph g => VertexEnumerableGraph (IdentityT g) where
+  vertices = lift vertices
+
+instance (VertexEnumerableGraph g, Error e) => VertexEnumerableGraph (ErrorT e g) where
+  vertices = lift vertices
+
+instance VertexEnumerableGraph g => VertexEnumerableGraph (ReaderT m g) where
+  vertices = lift vertices
+
+instance VertexEnumerableGraph Identity where
+  vertices = Identity []

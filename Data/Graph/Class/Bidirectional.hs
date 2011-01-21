@@ -17,11 +17,18 @@ module Data.Graph.Class.Bidirectional
   ) where
 
 import Control.Monad
+import Control.Monad.Trans.Class
 import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.State.Lazy as Lazy
 import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
-import Control.Monad.Trans.Class
+import qualified Control.Monad.Trans.RWS.Strict as Strict
+import qualified Control.Monad.Trans.RWS.Lazy as Lazy
+import Control.Monad.Trans.Reader
+import Control.Monad.Trans.Identity
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.Error
+import Data.Functor.Identity
 import Data.Monoid
 import Data.Graph.Class.AdjacencyList
 
@@ -61,3 +68,46 @@ instance (BidirectionalGraph g, Monoid m) => BidirectionalGraph (Lazy.WriterT m 
   inDegree = lift . inDegree
   incidentEdges = lift . incidentEdges
   degree = lift . degree
+
+instance (BidirectionalGraph g, Monoid m) => BidirectionalGraph (Strict.RWST r m s g) where
+  inEdges  = lift . inEdges
+  inDegree = lift . inDegree
+  incidentEdges = lift . incidentEdges
+  degree = lift . degree
+
+instance (BidirectionalGraph g, Monoid m) => BidirectionalGraph (Lazy.RWST r m s g) where
+  inEdges  = lift . inEdges
+  inDegree = lift . inDegree
+  incidentEdges = lift . incidentEdges
+  degree = lift . degree
+
+instance BidirectionalGraph g => BidirectionalGraph (ReaderT e g) where
+  inEdges  = lift . inEdges
+  inDegree = lift . inDegree
+  incidentEdges = lift . incidentEdges
+  degree = lift . degree
+
+instance BidirectionalGraph g => BidirectionalGraph (IdentityT g) where
+  inEdges  = lift . inEdges
+  inDegree = lift . inDegree
+  incidentEdges = lift . incidentEdges
+  degree = lift . degree
+
+instance BidirectionalGraph g => BidirectionalGraph (MaybeT g) where
+  inEdges  = lift . inEdges
+  inDegree = lift . inDegree
+  incidentEdges = lift . incidentEdges
+  degree = lift . degree
+
+instance (BidirectionalGraph g, Error e) => BidirectionalGraph (ErrorT e g) where
+  inEdges  = lift . inEdges
+  inDegree = lift . inDegree
+  incidentEdges = lift . incidentEdges
+  degree = lift . degree
+
+instance BidirectionalGraph Identity where
+  inEdges _ = Identity []
+  inDegree _ = Identity 0
+  incidentEdges _ = Identity []
+  degree _  = Identity 0
+

@@ -17,12 +17,19 @@ module Data.Graph.Class.AdjacencyList
   , module Data.Graph.Class
   ) where
 
+import Control.Monad
+import Control.Monad.Trans.Class
 import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.State.Lazy as Lazy
 import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
-import Control.Monad
-import Control.Monad.Trans.Class
+import qualified Control.Monad.Trans.RWS.Strict as Strict
+import qualified Control.Monad.Trans.RWS.Lazy as Lazy
+import Control.Monad.Trans.Identity
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.Error
+import Control.Monad.Trans.Reader
+import Data.Functor.Identity
 import Data.Monoid
 import Data.Graph.Class
 
@@ -73,3 +80,50 @@ instance (AdjacencyListGraph g, Monoid m) => AdjacencyListGraph (Lazy.WriterT m 
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
+instance (AdjacencyListGraph g, Monoid m) => AdjacencyListGraph (Strict.RWST r m s g) where
+  adjacentVertices = lift . adjacentVertices
+  source = lift . source
+  target = lift . target
+  outEdges = lift . outEdges
+  outDegree = lift . outDegree
+
+instance (AdjacencyListGraph g, Monoid m) => AdjacencyListGraph (Lazy.RWST r m s g) where
+  adjacentVertices = lift . adjacentVertices
+  source = lift . source
+  target = lift . target
+  outEdges = lift . outEdges
+  outDegree = lift . outDegree
+
+instance AdjacencyListGraph g => AdjacencyListGraph (ReaderT e g) where
+  adjacentVertices = lift . adjacentVertices
+  source = lift . source
+  target = lift . target
+  outEdges = lift . outEdges
+  outDegree = lift . outDegree
+
+instance (AdjacencyListGraph g, Error e) => AdjacencyListGraph (ErrorT e g) where
+  adjacentVertices = lift . adjacentVertices
+  source = lift . source
+  target = lift . target
+  outEdges = lift . outEdges
+  outDegree = lift . outDegree
+
+instance AdjacencyListGraph g => AdjacencyListGraph (MaybeT g) where
+  adjacentVertices = lift . adjacentVertices
+  source = lift . source
+  target = lift . target
+  outEdges = lift . outEdges
+  outDegree = lift . outDegree
+
+instance AdjacencyListGraph g => AdjacencyListGraph (IdentityT g) where
+  adjacentVertices = lift . adjacentVertices
+  source = lift . source
+  target = lift . target
+  outEdges = lift . outEdges
+  outDegree = lift . outDegree
+
+instance AdjacencyListGraph Identity where
+  source = Identity
+  target = Identity
+  outEdges _ = Identity []
+  outDegree _ = Identity 0

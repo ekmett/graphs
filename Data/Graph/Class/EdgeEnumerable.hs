@@ -20,7 +20,14 @@ import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.State.Lazy as Lazy
 import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
+import qualified Control.Monad.Trans.RWS.Strict as Strict
+import qualified Control.Monad.Trans.RWS.Lazy as Lazy
+import Control.Monad.Trans.Reader
+import Control.Monad.Trans.Identity
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.Error
 import Control.Monad.Trans.Class
+import Data.Functor.Identity
 import Data.Monoid
 import Data.Graph.Class
 
@@ -39,3 +46,24 @@ instance (EdgeEnumerableGraph g, Monoid m) => EdgeEnumerableGraph (Strict.Writer
 
 instance (EdgeEnumerableGraph g, Monoid m) => EdgeEnumerableGraph (Lazy.WriterT m g) where
   edges = lift edges
+
+instance (EdgeEnumerableGraph g, Monoid m) => EdgeEnumerableGraph (Strict.RWST r m s g) where
+  edges = lift edges
+
+instance (EdgeEnumerableGraph g, Monoid m) => EdgeEnumerableGraph (Lazy.RWST r m s g) where
+  edges = lift edges
+
+instance EdgeEnumerableGraph g => EdgeEnumerableGraph (MaybeT g) where
+  edges = lift edges
+
+instance EdgeEnumerableGraph g => EdgeEnumerableGraph (IdentityT g) where
+  edges = lift edges
+
+instance (EdgeEnumerableGraph g, Error e) => EdgeEnumerableGraph (ErrorT e g) where
+  edges = lift edges
+
+instance EdgeEnumerableGraph g => EdgeEnumerableGraph (ReaderT e g) where
+  edges = lift edges
+
+instance EdgeEnumerableGraph Identity where
+  edges = Identity []

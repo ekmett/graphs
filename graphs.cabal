@@ -1,6 +1,6 @@
 name:          graphs
 category:      Data Structures
-version:       0.1
+version:       0.2
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -38,7 +38,6 @@ library
     Data.Graph.Class.Bidirectional
     Data.Graph.Class.VertexEnumerable
     Data.Graph.Dual
-    Data.Graph.Empty
     Data.Graph.PropertyMap
   other-modules
     Data.Graph.Internal.Color

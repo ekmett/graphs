@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Adjacency.Matrix
@@ -7,11 +7,11 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MPTCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Adjacency.Matrix
+module Data.Graph.AdjacencyMatrix
   ( AdjacencyMatrix(..)
   , ask
   ) where
@@ -22,7 +22,7 @@ import Data.Functor
 import Data.Array.IArray
 import Data.Graph.PropertyMap
 import Data.Graph.Class
-import Data.Graph.Class.Adjacency.Matrix
+import Data.Graph.Class.AdjacencyMatrix
 
 newtype AdjacencyMatrix arr i a = AdjacencyMatrix { runAdjacencyMatrix :: arr (i,i) Bool -> a } 
 
@@ -41,11 +41,13 @@ instance Monad (AdjacencyMatrix arr i) where
   return = AdjacencyMatrix . const
   AdjacencyMatrix f >>= k = AdjacencyMatrix $ \t -> runAdjacencyMatrix (k (f t)) t
 
-instance Ord i => Graph (AdjacencyMatrix arr i) i (i, i) where
+instance Ord i => Graph (AdjacencyMatrix arr i) where
+  type Vertex (AdjacencyMatrix arr i) = i
+  type Edge (AdjacencyMatrix arr i) = (i, i) 
   vertexMap = pure . propertyMap
   edgeMap = pure . propertyMap
 
-instance (IArray arr Bool, Ix i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) i (i, i) where
+instance (IArray arr Bool, Ix i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) where
   edge i j = AdjacencyMatrix $ \a ->
     if inRange (bounds a) ix && (a ! ix) 
     then Just ix

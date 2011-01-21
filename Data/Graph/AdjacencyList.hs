@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Adjacency.List
@@ -7,11 +7,11 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MPTCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Adjacency.List
+module Data.Graph.AdjacencyList
   ( AdjacencyList(..)
   , ask
   ) where
@@ -21,7 +21,7 @@ import Data.Ix
 import Data.Array
 import Data.Graph.PropertyMap
 import Data.Graph.Class
-import Data.Graph.Class.Adjacency.List
+import Data.Graph.Class.AdjacencyList
 
 newtype AdjacencyList i a = AdjacencyList { runAdjacencyList :: Array i [i] -> a }  
 
@@ -40,11 +40,13 @@ instance Monad (AdjacencyList i) where
   return = AdjacencyList . const
   AdjacencyList f >>= k = AdjacencyList $ \t -> runAdjacencyList (k (f t)) t
 
-instance Ord i => Graph (AdjacencyList i) i (i, i) where
+instance Ord i => Graph (AdjacencyList i) where
+  type Vertex (AdjacencyList i) = i
+  type Edge (AdjacencyList i) = (i, i)
   vertexMap = pure . propertyMap
   edgeMap = pure . propertyMap
 
-instance Ix i => AdjacencyListGraph (AdjacencyList i) i (i, i) where
+instance Ix i => AdjacencyListGraph (AdjacencyList i) where
   adjacentVertices v = AdjacencyList $ \g -> if inRange (bounds g) v 
                                      then g ! v 
                                      else []

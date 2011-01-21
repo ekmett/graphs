@@ -24,20 +24,24 @@ library
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,
     containers >= 0.3 && < 0.5,
-    void >= 0.1 && < 0.2,
+    void >= 0.3 && < 0.4,
     heaps >= 0.2 && < 0.3
 
   exposed-modules:
-    Data.Graph.Adjacency.List
-    Data.Graph.Adjacency.Matrix
+    Data.Graph.AdjacencyList
+    Data.Graph.AdjacencyMatrix
     Data.Graph.Algorithm.DepthFirstSearch
     Data.Graph.Algorithm.BreadthFirstSearch
     Data.Graph.Class
-    Data.Graph.Class.Adjacency.List
-    Data.Graph.Class.Adjacency.Matrix
+    Data.Graph.Class.AdjacencyList
+    Data.Graph.Class.AdjacencyMatrix
+    Data.Graph.Class.EdgeEnumerable
     Data.Graph.Class.Bidirectional
+    Data.Graph.Class.VertexEnumerable
     Data.Graph.Dual
     Data.Graph.Empty
     Data.Graph.PropertyMap
+  other-modules
+    Data.Graph.Internal.Color
 
   ghc-options: -Wall 

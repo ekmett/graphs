@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, DeriveFunctor #-}
+{-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.DepthFirstSearch
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MTPCs, fundeps, type families
+-- Portability :  type families
 --
 -- Depth-first search
 ----------------------------------------------------------------------------
@@ -16,31 +16,60 @@ module Data.Graph.Algorithm.DepthFirstSearch
   ( dfs, Dfs(..)
   ) where
 
-import Data.Default
-import Data.Foldable
+import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.State.Strict
+import Data.Default
+import Data.Foldable
 import Data.Monoid
+
 import Data.Graph.Class
-import Data.Graph.Class.Adjacency.List
+import Data.Graph.Class.AdjacencyList
 import Data.Graph.PropertyMap
+import Data.Graph.Internal.Color
 
-data Color = White | Gray | Black deriving (Eq,Ord,Show,Read)
+data Dfs g m = Dfs 
+  { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
+  , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
+  , exitVertex  :: Vertex g -> g m -- called once we have processed all descendants of a vertex
+  , blackTarget :: Edge g   -> g m -- called when we encounter a cross edge to a vertex we've already finished
+  }
 
-data Dfs v e m = Dfs 
-  { enterVertex   :: v -> m -- called the first time a vertex is discovered
-  , backEdge      :: e -> m -- called when we encounter a back edge to a vertex we're still processing
-  , exitVertex    :: v -> m -- called once we have processed all descendants of a vertex
-  , crossEdge     :: e -> m -- called when we encounter a cross edge to a vertex we've already finished
-  } deriving (Functor)
+instance Graph g => Functor (Dfs g) where
+  fmap f (Dfs a b c d) = Dfs 
+    (liftM f . a)
+    (liftM f . b)
+    (liftM f . c)
+    (liftM f . d)
 
-instance Monoid m => Default (Dfs v e m) where
-  def = Dfs 
-    (const mempty)
-    (const mempty)
-    (const mempty)
-    (const mempty)
+instance Graph g => Applicative (Dfs g) where
+  pure a = Dfs 
+    (const (return a))
+    (const (return a))
+    (const (return a))
+    (const (return a))
+
+  m <*> n = Dfs
+    (\v -> enterVertex m v `ap` enterVertex n v)
+    (\e -> grayTarget m e `ap`  grayTarget n e)
+    (\v -> exitVertex m v `ap`  exitVertex n v)
+    (\e -> blackTarget m e `ap` blackTarget n e)
+
+instance Graph g => Monad (Dfs g) where
+  return = pure
+  m >>= f = Dfs
+    (\v -> enterVertex m v >>= ($ v) . enterVertex . f)
+    (\e -> grayTarget m e >>= ($ e) . grayTarget . f)
+    (\v -> exitVertex m v >>= ($ v) . exitVertex . f)
+    (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
+
+instance (Graph g, Monoid m) => Default (Dfs g m) where
+  def = return mempty
+
+instance (Graph g, Monoid m) => Monoid (Dfs g m) where
+  mempty = return mempty
+  mappend = liftM2 mappend
 
 getS :: Monad g => k -> StateT (PropertyMap g k v) g v
 getS k = do
@@ -54,12 +83,13 @@ putS k v = do
   put m'
 
 -- TODO: CPS transform?
-dfs :: (AdjacencyListGraph g v e, Monoid m) => Dfs v e m -> v -> g m
+dfs :: (AdjacencyListGraph g, Monoid m) => Dfs g m -> Vertex g -> g m
 dfs vis v0 = do
   m <- vertexMap White 
   evalStateT (go v0) m where
   go v = do
-    putS v Gray
+    putS v Grey
+    lhs <- lift $ enterVertex vis v
     adjs <- lift $ outEdges v 
     result <- foldrM 
       (\e m -> do 
@@ -67,10 +97,11 @@ dfs vis v0 = do
         color <- getS v'
         liftM (`mappend` m) $ case color of
           White -> go v'
-          Gray  -> return $ backEdge vis e
-          Black -> return $ crossEdge vis e
+          Grey  -> lift $ grayTarget vis e
+          Black -> lift $ blackTarget vis e
       ) 
       mempty 
       adjs
     putS v Black
-    return $ enterVertex vis v `mappend` result `mappend` exitVertex vis v
+    rhs <- lift $ exitVertex vis v
+    return $ lhs `mappend` result `mappend` rhs

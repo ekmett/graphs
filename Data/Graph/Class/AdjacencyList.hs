@@ -1,17 +1,17 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleInstances #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Graph.Class.Adjacency.List
+-- Module      :  Data.Graph.Class.AdjacencyList
 -- Copyright   :  (C) 2011 Edward Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MPTCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Class.Adjacency.List
+module Data.Graph.Class.AdjacencyList
   ( AdjacencyListGraph(..)
   , defaultOutEdges
   , module Data.Graph.Class
@@ -26,49 +26,50 @@ import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.Class
 
-defaultOutEdges :: AdjacencyListGraph g v e => v -> g [(v, v)]
+defaultOutEdges :: AdjacencyListGraph g => Vertex g -> g [(Vertex g, Vertex g)]
 defaultOutEdges v = liftM (map ((,) v)) (adjacentVertices v)
 
 -- | Minimal definition: 'source', 'target', and either 'adjacentVertices' with @'outEdges' = 'defaultOutEdges'@ or 'outEdges'
-class Graph g v e => AdjacencyListGraph g v e | g -> v e where
+class Graph g => AdjacencyListGraph g where
   -- /O(1)/
-  source :: e -> g v
+  source :: Edge g -> g (Vertex g)
   -- /O(1)/
-  target :: e -> g v
+  target :: Edge g -> g (Vertex g)
   -- /O(e)/ in the number of out edges
-  outEdges :: v -> g [e]
+  outEdges :: Vertex g -> g [Edge g]
 
   -- /O(e)/
-  outDegree :: v -> g Int
+  outDegree :: Vertex g -> g Int
   outDegree v = liftM length (outEdges v)
 
-  adjacentVertices :: v -> g [v]
+  adjacentVertices :: Vertex g -> g [Vertex g]
   adjacentVertices = outEdges >=> mapM target
 
-instance AdjacencyListGraph g v e => AdjacencyListGraph (Strict.StateT s g) v e where
+instance AdjacencyListGraph g => AdjacencyListGraph (Strict.StateT s g) where
   adjacentVertices = lift . adjacentVertices
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
-instance AdjacencyListGraph g v e => AdjacencyListGraph (Lazy.StateT s g) v e where
+instance AdjacencyListGraph g => AdjacencyListGraph (Lazy.StateT s g) where
   adjacentVertices = lift . adjacentVertices
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
-instance (AdjacencyListGraph g v e, Monoid m) => AdjacencyListGraph (Strict.WriterT m g) v e where
+instance (AdjacencyListGraph g, Monoid m) => AdjacencyListGraph (Strict.WriterT m g) where
   adjacentVertices = lift . adjacentVertices
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
 
-instance (AdjacencyListGraph g v e, Monoid m) => AdjacencyListGraph (Lazy.WriterT m g) v e where
+instance (AdjacencyListGraph g, Monoid m) => AdjacencyListGraph (Lazy.WriterT m g) where
   adjacentVertices = lift . adjacentVertices
   source = lift . source
   target = lift . target
   outEdges = lift . outEdges
   outDegree = lift . outDegree
+

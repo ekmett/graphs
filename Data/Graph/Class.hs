@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MPTCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
@@ -24,22 +24,32 @@ import Control.Monad.Trans.Class
 import Data.Monoid
 import Data.Graph.PropertyMap
 
-class (Monad g, Eq v, Eq e) => Graph g v e | g -> v e where
-  vertexMap :: a -> g (PropertyMap g v a)
-  edgeMap   :: a -> g (PropertyMap g e a)
+class (Monad g, Eq (Vertex g), Eq (Edge g)) => Graph g where
+  type Vertex g :: *
+  type Edge g :: * 
+  vertexMap :: a -> g (PropertyMap g (Vertex g) a)
+  edgeMap   :: a -> g (PropertyMap g (Edge g) a)
 
-instance Graph g v e => Graph (Strict.StateT s g) v e where
+instance Graph g => Graph (Strict.StateT s g) where
+  type Vertex (Strict.StateT s g) = Vertex g
+  type Edge (Strict.StateT s g) = Edge g
   vertexMap = lift . liftM liftPropertyMap . vertexMap
   edgeMap = lift . liftM liftPropertyMap . edgeMap
 
-instance Graph g v e => Graph (Lazy.StateT s g) v e where
+instance Graph g => Graph (Lazy.StateT s g) where
+  type Vertex (Lazy.StateT s g) = Vertex g
+  type Edge (Lazy.StateT s g) = Edge g
   vertexMap = lift . liftM liftPropertyMap . vertexMap
   edgeMap = lift . liftM liftPropertyMap . edgeMap
 
-instance (Graph g v e, Monoid m) => Graph (Strict.WriterT m g) v e where
+instance (Graph g, Monoid m) => Graph (Strict.WriterT m g) where
+  type Vertex (Strict.WriterT m g) = Vertex g
+  type Edge (Strict.WriterT m g) = Edge g
   vertexMap = lift . liftM liftPropertyMap . vertexMap
   edgeMap = lift . liftM liftPropertyMap . edgeMap
 
-instance (Graph g v e, Monoid m) => Graph (Lazy.WriterT m g) v e where
+instance (Graph g, Monoid m) => Graph (Lazy.WriterT m g) where
+  type Vertex (Lazy.WriterT m g) = Vertex g
+  type Edge (Lazy.WriterT m g) = Edge g
   vertexMap = lift . liftM liftPropertyMap . vertexMap
   edgeMap = lift . liftM liftPropertyMap . edgeMap

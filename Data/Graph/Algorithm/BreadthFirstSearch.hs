@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, DeriveFunctor #-}
+{-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.BreadthFirstSearch
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MTPCs, fundeps, type families
+-- Portability :  type families
 --
 -- Breadth-first search
 ----------------------------------------------------------------------------
@@ -16,32 +16,62 @@ module Data.Graph.Algorithm.BreadthFirstSearch
   ( bfs, Bfs(..)
   ) where
 
-import Data.Default
-import Data.Foldable
+import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.State.Strict
+import Data.Default
+import Data.Foldable
 import Data.Monoid
-import Data.Graph.Class
-import Data.Graph.Class.Adjacency.List
-import Data.Graph.PropertyMap
 import Data.Sequence
 
-data Color = White | Gray | Black deriving (Eq,Ord,Show,Read)
+import Data.Graph.Class
+import Data.Graph.Class.AdjacencyList
+import Data.Graph.PropertyMap
+import Data.Graph.Internal.Color
 
-data Bfs v e m = Bfs 
-  { enterVertex :: v -> m -- called the first time a vertex is discovered
-  , grayTarget  :: e -> m -- called when we encounter a back edge to a vertex we're still processing
-  , exitVertex  :: v -> m -- called once we have processed all descendants of a vertex
-  , blackTarget :: e -> m -- called when we encounter a cross edge to a vertex we've already finished
-  } deriving (Functor)
+-- | Breadth first search visitor 
+data Bfs g m = Bfs 
+  { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
+  , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
+  , exitVertex  :: Vertex g -> g m -- called once we have processed all descendants of a vertex
+  , blackTarget :: Edge g   -> g m -- called when we encounter a cross edge to a vertex we've already finished
+  } 
 
-instance Monoid m => Default (Bfs v e m) where
-  def = Bfs 
-    (const mempty)
-    (const mempty)
-    (const mempty)
-    (const mempty)
+instance Graph g => Functor (Bfs g) where
+  fmap f (Bfs a b c d) = Bfs 
+    (liftM f . a)
+    (liftM f . b)
+    (liftM f . c)
+    (liftM f . d)
+
+instance Graph g => Applicative (Bfs g) where
+  pure a = Bfs 
+    (const (return a))
+    (const (return a))
+    (const (return a))
+    (const (return a))
+
+  m <*> n = Bfs
+    (\v -> enterVertex m v `ap` enterVertex n v)
+    (\e -> grayTarget m e `ap`  grayTarget n e)
+    (\v -> exitVertex m v `ap`  exitVertex n v)
+    (\e -> blackTarget m e `ap` blackTarget n e)
+
+instance Graph g => Monad (Bfs g) where
+  return = pure
+  m >>= f = Bfs
+    (\v -> enterVertex m v >>= ($ v) . enterVertex . f)
+    (\e -> grayTarget m e >>= ($ e) . grayTarget . f)
+    (\v -> exitVertex m v >>= ($ v) . exitVertex . f)
+    (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
+
+instance (Graph g, Monoid m) => Default (Bfs g m) where
+  def = return mempty
+
+instance (Graph g, Monoid m) => Monoid (Bfs g m) where
+  mempty = return mempty
+  mappend = liftM2 mappend
 
 getS :: Monad g => k -> StateT (Seq v, PropertyMap g k Color) g Color
 getS k = do
@@ -54,22 +84,24 @@ putS k v = do
   m' <- lift $ putP m k v
   modify $ \(q,_) -> (q, m')
 
-enqueue :: Monad g => Bfs v e m -> v -> StateT (Seq v, PropertyMap g v Color) g m
+enqueue :: Graph g 
+        => Bfs g m 
+        -> Vertex g 
+        -> StateT (Seq (Vertex g), PropertyMap g (Vertex g) Color) g m
 enqueue vis v = do
   m <- gets snd
-  m' <- lift $ putP m v Gray
+  m' <- lift $ putP m v Grey
   modify $ \(q,_) -> (q |> v, m')
-  return $ enterVertex vis v
+  lift $ enterVertex vis v
 
 dequeue :: Monad g => StateT (Seq v, s) g r -> (v -> StateT (Seq v, s) g r) -> StateT (Seq v, s) g r
 dequeue ke ks = do
   (q, m) <- get
   case viewl q of
-    EmptyL      -> ke
+    EmptyL -> ke
     (a :< q') -> put (q', m) >> ks a
 
--- TODO: CPS transform?
-bfs :: (AdjacencyListGraph g v e, Monoid m) => Bfs v e m -> v -> g m
+bfs :: (AdjacencyListGraph g, Monoid m) => Bfs g m -> Vertex g -> g m
 bfs vis v0 = do
   m <- vertexMap White 
   evalStateT (enqueue vis v0 >>= pump) (mempty, m) 
@@ -82,9 +114,9 @@ bfs vis v0 = do
         color <- getS v'
         liftM (`mappend` m) $ case color of
           White -> enqueue vis v' 
-          Gray -> return $ grayTarget vis e
-          Black -> return $ blackTarget vis e)
-      mempty
-      adjs
+          Grey -> lift $ grayTarget vis e
+          Black -> lift $ blackTarget vis e
+      ) mempty adjs
     putS v Black
-    pump $ lhs `mappend` children `mappend` exitVertex vis v
+    rhs <- lift $ exitVertex vis v 
+    pump $ lhs `mappend` children `mappend` rhs

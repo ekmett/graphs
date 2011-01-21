@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Dual
@@ -7,7 +7,7 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MPTCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
@@ -19,7 +19,10 @@ import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans.Class
 import Data.Graph.PropertyMap
-import Data.Graph.Class.Adjacency.Matrix
+import Data.Graph.Class.AdjacencyList
+import Data.Graph.Class.AdjacencyMatrix
+import Data.Graph.Class.EdgeEnumerable
+import Data.Graph.Class.VertexEnumerable
 import Data.Graph.Class.Bidirectional
 
 newtype Dual g a = Dual { runDual :: g a }
@@ -42,21 +45,29 @@ instance Monad g => Monad (Dual g) where
   Dual g >>= k = Dual (g >>= runDual . k)
   Dual g >> Dual h = Dual (g >> h)
 
-instance Graph g v e => Graph (Dual g) v e where
+instance Graph g => Graph (Dual g) where
+  type Vertex (Dual g) = Vertex g
+  type Edge (Dual g) = Edge g
   vertexMap = Dual . liftM liftPropertyMap . vertexMap
   edgeMap   = Dual . liftM liftPropertyMap . edgeMap
 
-instance AdjacencyMatrixGraph g v e => AdjacencyMatrixGraph (Dual g) v e where
+instance AdjacencyMatrixGraph g => AdjacencyMatrixGraph (Dual g) where
   edge l r = Dual (edge r l)
 
-instance BidirectionalGraph g v e => AdjacencyListGraph (Dual g) v e where
+instance BidirectionalGraph g => AdjacencyListGraph (Dual g) where
   source = Dual . target
   target = Dual . source
   outEdges = Dual . inEdges
   outDegree = Dual . inDegree
 
-instance BidirectionalGraph g v e => BidirectionalGraph (Dual g) v e where
+instance BidirectionalGraph g => BidirectionalGraph (Dual g) where
   inEdges = Dual . outEdges
   inDegree = Dual . inDegree
   incidentEdges = Dual . incidentEdges
   degree = Dual . degree
+
+instance EdgeEnumerableGraph g => EdgeEnumerableGraph (Dual g) where
+  edges = Dual edges 
+
+instance VertexEnumerableGraph g => VertexEnumerableGraph (Dual g) where
+  vertices = Dual vertices

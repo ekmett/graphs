@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class.Bidirectional
@@ -7,13 +7,13 @@
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
--- Portability :  MPTCs, fundeps
+-- Portability :  type families
 --
 ----------------------------------------------------------------------------
 
 module Data.Graph.Class.Bidirectional 
   ( BidirectionalGraph(..)
-  , module Data.Graph.Class.Adjacency.List
+  , module Data.Graph.Class.AdjacencyList
   ) where
 
 import Control.Monad
@@ -23,40 +23,40 @@ import qualified Control.Monad.Trans.Writer.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Class
 import Data.Monoid
-import Data.Graph.Class.Adjacency.List
+import Data.Graph.Class.AdjacencyList
 
-class AdjacencyListGraph g v e => BidirectionalGraph g v e | g -> v e where
+class AdjacencyListGraph g => BidirectionalGraph g where
   -- /O(e)/
-  inEdges :: v -> g [e]
+  inEdges :: Vertex g -> g [Edge g]
   -- /O(e)/
-  inDegree :: v -> g Int
+  inDegree :: Vertex g -> g Int
   inDegree v = length `liftM` inEdges v
   
-  incidentEdges :: v -> g [e]
+  incidentEdges :: Vertex g -> g [Edge g]
   incidentEdges v = liftM2 (++) (inEdges v) (outEdges v)
 
-  degree :: v -> g Int
+  degree :: Vertex g -> g Int
   degree v = liftM2 (+) (inDegree v) (outDegree v)
 
-instance BidirectionalGraph g v e => BidirectionalGraph (Strict.StateT s g) v e where
+instance BidirectionalGraph g => BidirectionalGraph (Strict.StateT s g) where
   inEdges  = lift . inEdges
   inDegree = lift . inDegree
   incidentEdges = lift . incidentEdges
   degree = lift . degree
 
-instance BidirectionalGraph g v e => BidirectionalGraph (Lazy.StateT s g) v e where
+instance BidirectionalGraph g => BidirectionalGraph (Lazy.StateT s g) where
   inEdges  = lift . inEdges
   inDegree = lift . inDegree
   incidentEdges = lift . incidentEdges
   degree = lift . degree
 
-instance (BidirectionalGraph g v e, Monoid m) => BidirectionalGraph (Strict.WriterT m g) v e where
+instance (BidirectionalGraph g, Monoid m) => BidirectionalGraph (Strict.WriterT m g) where
   inEdges  = lift . inEdges
   inDegree = lift . inDegree
   incidentEdges = lift . incidentEdges
   degree = lift . degree
 
-instance (BidirectionalGraph g v e, Monoid m) => BidirectionalGraph (Lazy.WriterT m g) v e where
+instance (BidirectionalGraph g, Monoid m) => BidirectionalGraph (Lazy.WriterT m g) where
   inEdges  = lift . inEdges
   inDegree = lift . inDegree
   incidentEdges = lift . incidentEdges

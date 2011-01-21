@@ -24,8 +24,7 @@ library
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,
     containers >= 0.3 && < 0.5,
-    void >= 0.3 && < 0.4,
-    heaps >= 0.2 && < 0.3
+    void >= 0.3 && < 0.4
 
   exposed-modules:
     Data.Graph.AdjacencyList

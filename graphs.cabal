@@ -1,6 +1,6 @@
 name:          graphs
 category:      Data Structures
-version:       0.2
+version:       0.3
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -39,7 +39,7 @@ library
     Data.Graph.Class.VertexEnumerable
     Data.Graph.Dual
     Data.Graph.PropertyMap
-  other-modules
+  other-modules:
     Data.Graph.Internal.Color
 
   ghc-options: -Wall 

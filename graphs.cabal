@@ -1,6 +1,6 @@
 name:          graphs
 category:      Data Structures
-version:       0.3
+version:       0.3.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -24,7 +24,7 @@ library
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,
     containers >= 0.3 && < 0.5,
-    void >= 0.3 && < 0.4
+    void >= 0.4 && < 0.5
 
   exposed-modules:
     Data.Graph.AdjacencyList

@@ -116,7 +116,7 @@ instance (Graph g, Monoid w) => Graph (Strict.RWST r w s g) where
   edgeMap = liftEdgeMap
 
 voidMap :: PropertyMap Identity Void a
-voidMap = PropertyMap (Identity . void) $ \_ _ -> Identity voidMap
+voidMap = PropertyMap (Identity . absurd) $ \_ _ -> Identity voidMap
 
 -- | The empty graph
 instance Graph Identity where

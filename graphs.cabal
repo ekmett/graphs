@@ -1,6 +1,6 @@
 name:          graphs
 category:      Data Structures
-version:       0.3.2
+version:       0.3.2.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -19,7 +19,7 @@ source-repository head
 
 library
   build-depends: 
-    base >= 4 && < 4.4,
+    base >= 4 && < 5,
     array >= 0.3 && < 0.5,
     data-default >= 0.2 && < 0.3,
     transformers >= 0.2.2 && < 0.3,

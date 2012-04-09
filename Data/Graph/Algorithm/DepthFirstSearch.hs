@@ -20,7 +20,6 @@ import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.State.Strict
-import Data.Default
 import Data.Foldable
 import Data.Monoid
 
@@ -63,9 +62,6 @@ instance Graph g => Monad (Dfs g) where
     (\e -> grayTarget m e >>= ($ e) . grayTarget . f)
     (\v -> exitVertex m v >>= ($ v) . exitVertex . f)
     (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
-
-instance (Graph g, Monoid m) => Default (Dfs g m) where
-  def = return mempty
 
 instance (Graph g, Monoid m) => Monoid (Dfs g m) where
   mempty = return mempty

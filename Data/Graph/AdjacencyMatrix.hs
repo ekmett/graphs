@@ -18,7 +18,6 @@ module Data.Graph.AdjacencyMatrix
 
 import Control.Applicative
 import Data.Ix
-import Data.Functor
 import Data.Array.IArray
 import Data.Graph.PropertyMap
 import Data.Graph.Class

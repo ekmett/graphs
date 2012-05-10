@@ -1,6 +1,6 @@
 name:          graphs
 category:      Data Structures
-version:       0.4.0.1
+version:       0.4.0.2
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -8,10 +8,12 @@ author:        Edward A. Kmett
 maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     experimental
 homepage:      http://github.com/ekmett/graphs
+bug-reports:   http://github.com/ekmett/graphs/issues
 copyright:     Copyright (C) 2011 Edward A. Kmett
 synopsis:      A simple monadic graph library
 description:   A simple monadic graph library
 build-type:    Simple
+extra-source-files: .travis.yml
 
 source-repository head
   type: git

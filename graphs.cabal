@@ -13,6 +13,7 @@ copyright:     Copyright (C) 2011 Edward A. Kmett
 synopsis:      A simple monadic graph library
 description:   A simple monadic graph library
 build-type:    Simple
+
 extra-source-files: .travis.yml
 
 source-repository head

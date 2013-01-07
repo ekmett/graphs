@@ -1,6 +1,6 @@
 name:          graphs
 category:      Data Structures
-version:       0.4.0.3
+version:       0.4.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -30,7 +30,7 @@ library
     array        >= 0.3     && < 0.5,
     transformers >= 0.2.2   && < 0.4,
     containers   >= 0.3     && < 0.6,
-    void         >= 0.5.5.1 && < 0.6
+    void         >= 0.5.5.1
 
   exposed-modules:
     Data.Graph.AdjacencyList
@@ -49,3 +49,4 @@ library
     Data.Graph.Internal.Color
 
   ghc-options: -Wall
+  hs-source-dirs: src

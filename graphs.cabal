@@ -1,5 +1,5 @@
 name:          graphs
-category:      Data Structures
+category:      Algorithms, Data Structures, Graphs
 version:       0.4.1
 license:       BSD3
 cabal-version: >= 1.6

@@ -30,17 +30,19 @@ import Data.Graph.Internal.Color
 
 data Dfs g m = Dfs 
   { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
+  , enterEdge   :: Edge g   -> g m -- called the first time an edge is discovered, before enterVertex
   , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
   , exitVertex  :: Vertex g -> g m -- called once we have processed all descendants of a vertex
   , blackTarget :: Edge g   -> g m -- called when we encounter a cross edge to a vertex we've already finished
   }
 
 instance Graph g => Functor (Dfs g) where
-  fmap f (Dfs a b c d) = Dfs 
+  fmap f (Dfs a b c d e) = Dfs
     (liftM f . a)
     (liftM f . b)
     (liftM f . c)
     (liftM f . d)
+    (liftM f . e)
 
 instance Graph g => Applicative (Dfs g) where
   pure a = Dfs 
@@ -48,9 +50,11 @@ instance Graph g => Applicative (Dfs g) where
     (const (return a))
     (const (return a))
     (const (return a))
+    (const (return a))
 
   m <*> n = Dfs
     (\v -> enterVertex m v `ap` enterVertex n v)
+    (\e -> enterEdge m e `ap`   enterEdge n e)
     (\e -> grayTarget m e `ap`  grayTarget n e)
     (\v -> exitVertex m v `ap`  exitVertex n v)
     (\e -> blackTarget m e `ap` blackTarget n e)
@@ -59,6 +63,7 @@ instance Graph g => Monad (Dfs g) where
   return = pure
   m >>= f = Dfs
     (\v -> enterVertex m v >>= ($ v) . enterVertex . f)
+    (\e -> enterEdge m e >>= ($ e) . enterEdge . f)
     (\e -> grayTarget m e >>= ($ e) . grayTarget . f)
     (\v -> exitVertex m v >>= ($ v) . exitVertex . f)
     (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
@@ -92,7 +97,7 @@ dfs vis v0 = do
         v' <- target e
         color <- getS v'
         liftM (`mappend` m) $ case color of
-          White -> go v'
+          White -> (liftM2 mappend) (lift $ enterEdge vis e) (go v')
           Grey  -> lift $ grayTarget vis e
           Black -> lift $ blackTarget vis e
       ) 

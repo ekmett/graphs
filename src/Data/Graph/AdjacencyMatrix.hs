@@ -13,6 +13,7 @@
 
 module Data.Graph.AdjacencyMatrix
   ( AdjacencyMatrix(..)
+  , AdjacencyMatrixGraph
   , ask
   ) where
 

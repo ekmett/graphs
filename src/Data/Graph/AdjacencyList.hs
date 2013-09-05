@@ -13,6 +13,7 @@
 
 module Data.Graph.AdjacencyList
   ( AdjacencyList(..)
+  , AdjacencyListGraph
   , ask
   ) where
 

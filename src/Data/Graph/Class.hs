@@ -11,7 +11,7 @@
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Class 
+module Data.Graph.Class
   ( Graph(..)
   , VertexMap
   , EdgeMap
@@ -29,7 +29,7 @@ import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import Control.Monad.Trans.Identity
 import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Error
-import Control.Monad.Trans.Reader 
+import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Class
 import Data.Functor.Identity
 import Data.Monoid
@@ -41,16 +41,16 @@ type EdgeMap g = PropertyMap g (Edge g)
 
 class (Monad g, Eq (Vertex g), Eq (Edge g)) => Graph g where
   type Vertex g :: *
-  type Edge g :: * 
+  type Edge g :: *
   vertexMap :: a -> g (VertexMap g a)
   edgeMap   :: a -> g (EdgeMap g a)
 
-liftVertexMap :: (MonadTrans t, Graph (t g), Graph g, Vertex (t g) ~ Vertex g) 
+liftVertexMap :: (MonadTrans t, Graph (t g), Graph g, Vertex (t g) ~ Vertex g)
               => a -> t g (VertexMap (t g) a)
 liftVertexMap = lift . liftM liftPropertyMap . vertexMap
 {-# INLINE liftVertexMap #-}
 
-liftEdgeMap :: (MonadTrans t, Graph (t g), Graph g, Edge (t g) ~ Edge g) 
+liftEdgeMap :: (MonadTrans t, Graph (t g), Graph g, Edge (t g) ~ Edge g)
             => a -> t g (EdgeMap (t g) a)
 liftEdgeMap = lift . liftM liftPropertyMap . edgeMap
 {-# INLINE liftEdgeMap #-}
@@ -80,7 +80,7 @@ instance (Graph g, Monoid m) => Graph (Lazy.WriterT m g) where
   edgeMap = liftEdgeMap
 
 instance Graph g => Graph (ReaderT m g) where
-  type Vertex (ReaderT m g) = Vertex g 
+  type Vertex (ReaderT m g) = Vertex g
   type Edge (ReaderT m g) = Edge g
   vertexMap = liftVertexMap
   edgeMap = liftEdgeMap
@@ -122,6 +122,6 @@ voidMap = PropertyMap (Identity . absurd) $ \_ _ -> Identity voidMap
 instance Graph Identity where
   type Vertex Identity = Void
   type Edge Identity = Void
-  vertexMap _ = Identity voidMap 
+  vertexMap _ = Identity voidMap
   edgeMap   _ = Identity voidMap
 

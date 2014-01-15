@@ -49,7 +49,7 @@ instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Lazy.Writ
 
 instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Strict.RWST r m s g) where
   vertices = lift vertices
-  
+
 instance (VertexEnumerableGraph g, Monoid m) => VertexEnumerableGraph (Lazy.RWST r m s g) where
   vertices = lift vertices
 

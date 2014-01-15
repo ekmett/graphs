@@ -11,7 +11,7 @@
 --
 ----------------------------------------------------------------------------
 
-module Data.Graph.Class.Bidirectional 
+module Data.Graph.Class.Bidirectional
   ( BidirectionalGraph(..)
   , module Data.Graph.Class.AdjacencyList
   ) where
@@ -38,7 +38,7 @@ class AdjacencyListGraph g => BidirectionalGraph g where
   -- /O(e)/
   inDegree :: Vertex g -> g Int
   inDegree v = length `liftM` inEdges v
-  
+
   incidentEdges :: Vertex g -> g [Edge g]
   incidentEdges v = liftM2 (++) (inEdges v) (outEdges v)
 

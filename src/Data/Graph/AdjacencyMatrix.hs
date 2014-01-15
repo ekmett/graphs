@@ -24,7 +24,7 @@ import Data.Graph.PropertyMap
 import Data.Graph.Class
 import Data.Graph.Class.AdjacencyMatrix
 
-newtype AdjacencyMatrix arr i a = AdjacencyMatrix { runAdjacencyMatrix :: arr (i,i) Bool -> a } 
+newtype AdjacencyMatrix arr i a = AdjacencyMatrix { runAdjacencyMatrix :: arr (i,i) Bool -> a }
 
 ask :: AdjacencyMatrix arr i (arr (i, i) Bool)
 ask = AdjacencyMatrix id
@@ -43,13 +43,13 @@ instance Monad (AdjacencyMatrix arr i) where
 
 instance Ord i => Graph (AdjacencyMatrix arr i) where
   type Vertex (AdjacencyMatrix arr i) = i
-  type Edge (AdjacencyMatrix arr i) = (i, i) 
+  type Edge (AdjacencyMatrix arr i) = (i, i)
   vertexMap = pure . propertyMap
   edgeMap = pure . propertyMap
 
 instance (IArray arr Bool, Ix i) => AdjacencyMatrixGraph (AdjacencyMatrix arr i) where
   edge i j = AdjacencyMatrix $ \a ->
-    if inRange (bounds a) ix && (a ! ix) 
+    if inRange (bounds a) ix && (a ! ix)
     then Just ix
     else Nothing
     where ix = (i, j)

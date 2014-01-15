@@ -67,7 +67,7 @@ instance BidirectionalGraph g => BidirectionalGraph (Dual g) where
   degree = Dual . degree
 
 instance EdgeEnumerableGraph g => EdgeEnumerableGraph (Dual g) where
-  edges = Dual edges 
+  edges = Dual edges
 
 instance VertexEnumerableGraph g => VertexEnumerableGraph (Dual g) where
   vertices = Dual vertices

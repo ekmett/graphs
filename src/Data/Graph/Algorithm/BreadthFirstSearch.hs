@@ -29,14 +29,14 @@ import Data.Graph.Class.AdjacencyList
 import Data.Graph.PropertyMap
 import Data.Graph.Internal.Color
 
--- | Breadth first search visitor 
-data Bfs g m = Bfs 
+-- | Breadth first search visitor
+data Bfs g m = Bfs
   { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
   , enterEdge   :: Edge g   -> g m -- called the first time an edge is discovered, before enter
   , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
   , exitVertex  :: Vertex g -> g m -- called once we have processed all descendants of a vertex
   , blackTarget :: Edge g   -> g m -- called when we encounter a cross edge to a vertex we've already finished
-  } 
+  }
 
 instance Graph g => Functor (Bfs g) where
   fmap f (Bfs a b c d e) = Bfs
@@ -47,7 +47,7 @@ instance Graph g => Functor (Bfs g) where
     (liftM f . e)
 
 instance Graph g => Applicative (Bfs g) where
-  pure a = Bfs 
+  pure a = Bfs
     (const (return a))
     (const (return a))
     (const (return a))
@@ -76,18 +76,18 @@ instance (Graph g, Monoid m) => Monoid (Bfs g m) where
 
 getS :: Monad g => k -> StateT (Seq v, PropertyMap g k Color) g Color
 getS k = do
-  m <- gets snd 
+  m <- gets snd
   lift (getP m k)
 
 putS :: Monad g => k -> Color -> StateT (Seq v, PropertyMap g k Color) g ()
 putS k v = do
-  m <- gets snd 
+  m <- gets snd
   m' <- lift $ putP m k v
   modify $ \(q,_) -> (q, m')
 
-enqueue :: Graph g 
-        => Bfs g m 
-        -> Vertex g 
+enqueue :: Graph g
+        => Bfs g m
+        -> Vertex g
         -> StateT (Seq (Vertex g), PropertyMap g (Vertex g) Color) g m
 enqueue vis v = do
   m <- gets snd
@@ -104,12 +104,12 @@ dequeue ke ks = do
 
 bfs :: (AdjacencyListGraph g, Monoid m) => Bfs g m -> Vertex g -> g m
 bfs vis v0 = do
-  m <- vertexMap White 
-  evalStateT (enqueue vis v0 >>= pump) (mempty, m) 
+  m <- vertexMap White
+  evalStateT (enqueue vis v0 >>= pump) (mempty, m)
   where
   pump lhs = dequeue (return lhs) $ \ v -> do
     adjs <- lift $ outEdges v
-    children <- foldrM 
+    children <- foldrM
       (\e m -> do
         v' <- target e
         color <- getS v'
@@ -119,5 +119,5 @@ bfs vis v0 = do
           Black -> lift $ blackTarget vis e
       ) mempty adjs
     putS v Black
-    rhs <- lift $ exitVertex vis v 
+    rhs <- lift $ exitVertex vis v
     pump $ lhs `mappend` children `mappend` rhs

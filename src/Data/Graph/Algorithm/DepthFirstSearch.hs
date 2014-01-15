@@ -28,7 +28,7 @@ import Data.Graph.Class.AdjacencyList
 import Data.Graph.PropertyMap
 import Data.Graph.Internal.Color
 
-data Dfs g m = Dfs 
+data Dfs g m = Dfs
   { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
   , enterEdge   :: Edge g   -> g m -- called the first time an edge is discovered, before enterVertex
   , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
@@ -45,7 +45,7 @@ instance Graph g => Functor (Dfs g) where
     (liftM f . e)
 
 instance Graph g => Applicative (Dfs g) where
-  pure a = Dfs 
+  pure a = Dfs
     (const (return a))
     (const (return a))
     (const (return a))
@@ -74,34 +74,34 @@ instance (Graph g, Monoid m) => Monoid (Dfs g m) where
 
 getS :: Monad g => k -> StateT (PropertyMap g k v) g v
 getS k = do
-  m <- get 
+  m <- get
   lift (getP m k)
 
 putS :: Monad g => k -> v -> StateT (PropertyMap g k v) g ()
 putS k v = do
-  m <- get 
+  m <- get
   m' <- lift $ putP m k v
   put m'
 
 -- TODO: CPS transform?
 dfs :: (AdjacencyListGraph g, Monoid m) => Dfs g m -> Vertex g -> g m
 dfs vis v0 = do
-  m <- vertexMap White 
+  m <- vertexMap White
   evalStateT (go v0) m where
   go v = do
     putS v Grey
     lhs <- lift $ enterVertex vis v
-    adjs <- lift $ outEdges v 
-    result <- foldrM 
-      (\e m -> do 
+    adjs <- lift $ outEdges v
+    result <- foldrM
+      (\e m -> do
         v' <- target e
         color <- getS v'
         liftM (`mappend` m) $ case color of
           White -> (liftM2 mappend) (lift $ enterEdge vis e) (go v')
           Grey  -> lift $ grayTarget vis e
           Black -> lift $ blackTarget vis e
-      ) 
-      mempty 
+      )
+      mempty
       adjs
     putS v Black
     rhs <- lift $ exitVertex vis v

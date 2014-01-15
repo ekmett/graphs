@@ -12,7 +12,7 @@
 -- and edges in a graph
 ----------------------------------------------------------------------------
 
-module Data.Graph.PropertyMap 
+module Data.Graph.PropertyMap
   ( PropertyMap(..)
   , modifyP
   , intPropertyMap
@@ -38,7 +38,7 @@ modifyP m k f = do
 -- A pure IntMap-backed vertex map
 intPropertyMap :: Monad m => v -> PropertyMap m Int v
 intPropertyMap v0 = go v0 IntMap.empty where
-  go v m = PropertyMap 
+  go v m = PropertyMap
     { getP = \k -> return $ maybe v id (IntMap.lookup k m)
     , putP = \k v' -> return $ go v (IntMap.insert k v' m)
     }
@@ -46,24 +46,10 @@ intPropertyMap v0 = go v0 IntMap.empty where
 -- A pure Map-backed vertex map
 propertyMap :: (Monad m, Ord k) => v -> PropertyMap m k v
 propertyMap v0 = go v0 Map.empty where
-  go v m = PropertyMap 
+  go v m = PropertyMap
     { getP = \k -> return $ maybe v id (Map.lookup k m)
     , putP = \k v' -> return $ go v (Map.insert k v' m)
     }
 
 liftPropertyMap :: (MonadTrans t, Monad m, Monad (t m)) => PropertyMap m k v -> PropertyMap (t m) k v
 liftPropertyMap (PropertyMap g p) = PropertyMap (lift . g) (\k v -> liftPropertyMap `liftM` lift (p k v))
-
-{-
--- An impure STArray-backed vertex map
-stAdjVertexMap :: (DenseAdjacencyMatrix g, MonadST s g) => a -> g (PropertyMap g (Vertex g) a)
-stAdjVertexMap v0 = do
-  range <- vertexRange 
-  arr <- newSTArray range v0
-  return $ go arr
-  where
-    go arr = r where r = VertexMap
-      { getP = readSTArray arr
-      , putP = \k v -> writeSTArray arr k v >> return r
-      } 
--}

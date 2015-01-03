@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, ViewPatterns #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.BreadthFirstSearch
@@ -13,30 +13,31 @@
 ----------------------------------------------------------------------------
 
 module Data.Graph.Algorithm.BreadthFirstSearch
-  ( bfs, Bfs(..)
+  ( bfs
   ) where
 
-import Control.Applicative
-import Control.Monad
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Strict
-import Data.Foldable
+import Data.Sequence as S
 import Data.Monoid
-import Data.Sequence
 
 import Data.Graph.Class
 import Data.Graph.Class.AdjacencyList
-import Data.Graph.PropertyMap
-import Data.Graph.Internal.Color
 import Data.Graph.Algorithm.GraphSearch
 
 -- | Breadth first search visitor
-newtype Bfs g m = Bfs (GraphSearch g m)
+newtype Queue v = Queue {runQueue :: Seq v}
 
--- class Graph g => Collection g where
---   data Container g v :: *
---   emptyC  :: Container g v
---   nullC   :: Container g v -> Bool
---   getC    :: Container g v -> (v, Container g v)
---   putC    :: v -> Container g v -> Container g v
---   concatC :: Container g v -> Container g v -> Container g v
+instance Monoid (Queue v) where
+  mempty = Queue mempty
+  mappend (Queue q) (Queue q') = Queue (mappend q q')
+
+instance Container (Queue v) where
+  type Elem (Queue v) = v
+  emptyC = Queue empty
+  nullC (Queue q) = S.null q
+  getC (viewl . runQueue -> (a :< q)) = (a, Queue q)
+  getC _ = error "Queue is empty"
+  putC v (Queue q) = Queue (q |> v)
+  concatC (Queue q) (Queue q') = Queue (q >< q')
+
+bfs :: (AdjacencyListGraph g, Monoid m) => Queue (Vertex g) -> GraphSearch g m -> Vertex g -> g m
+bfs q vis v0 = graphSearch q vis v0

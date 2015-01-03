@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, ViewPatterns #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.DepthFirstSearch
@@ -13,96 +13,31 @@
 ----------------------------------------------------------------------------
 
 module Data.Graph.Algorithm.DepthFirstSearch
-  ( dfs, Dfs(..)
+  ( dfs
   ) where
 
-import Control.Applicative
-import Control.Monad
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Strict
-import Data.Foldable
+import Data.Sequence as S
 import Data.Monoid
 
 import Data.Graph.Class
 import Data.Graph.Class.AdjacencyList
-import Data.Graph.PropertyMap
-import Data.Graph.Internal.Color
+import Data.Graph.Algorithm.GraphSearch
 
-data Dfs g m = Dfs
-  { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
-  , enterEdge   :: Edge g   -> g m -- called the first time an edge is discovered, before enterVertex
-  , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
-  , exitVertex  :: Vertex g -> g m -- called once we have processed all descendants of a vertex
-  , blackTarget :: Edge g   -> g m -- called when we encounter a cross edge to a vertex we've already finished
-  }
+-- | Depth first search visitor
+newtype Stack v = Stack {runStack :: Seq v}
 
-instance Graph g => Functor (Dfs g) where
-  fmap f (Dfs a b c d e) = Dfs
-    (liftM f . a)
-    (liftM f . b)
-    (liftM f . c)
-    (liftM f . d)
-    (liftM f . e)
+instance Monoid (Stack v) where
+  mempty = Stack mempty
+  mappend (Stack q) (Stack q') = Stack (mappend q q')
 
-instance Graph g => Applicative (Dfs g) where
-  pure a = Dfs
-    (const (return a))
-    (const (return a))
-    (const (return a))
-    (const (return a))
-    (const (return a))
+instance Container (Stack v) where
+  type Elem (Stack v) = v
+  emptyC = Stack empty
+  nullC (Stack q) = S.null q
+  getC (viewr . runStack -> (q :> a)) = (a, Stack q)
+  getC _ = error "Stack is empty"
+  putC v (Stack q) = Stack (q |> v)
+  concatC (Stack q) (Stack q') = Stack (q >< q')
 
-  m <*> n = Dfs
-    (\v -> enterVertex m v `ap` enterVertex n v)
-    (\e -> enterEdge m e `ap`   enterEdge n e)
-    (\e -> grayTarget m e `ap`  grayTarget n e)
-    (\v -> exitVertex m v `ap`  exitVertex n v)
-    (\e -> blackTarget m e `ap` blackTarget n e)
-
-instance Graph g => Monad (Dfs g) where
-  return = pure
-  m >>= f = Dfs
-    (\v -> enterVertex m v >>= ($ v) . enterVertex . f)
-    (\e -> enterEdge m e >>= ($ e) . enterEdge . f)
-    (\e -> grayTarget m e >>= ($ e) . grayTarget . f)
-    (\v -> exitVertex m v >>= ($ v) . exitVertex . f)
-    (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
-
-instance (Graph g, Monoid m) => Monoid (Dfs g m) where
-  mempty = return mempty
-  mappend = liftM2 mappend
-
-getS :: Monad g => k -> StateT (PropertyMap g k v) g v
-getS k = do
-  m <- get
-  lift (getP m k)
-
-putS :: Monad g => k -> v -> StateT (PropertyMap g k v) g ()
-putS k v = do
-  m <- get
-  m' <- lift $ putP m k v
-  put m'
-
--- TODO: CPS transform?
-dfs :: (AdjacencyListGraph g, Monoid m) => Dfs g m -> Vertex g -> g m
-dfs vis v0 = do
-  m <- vertexMap White
-  evalStateT (go v0) m where
-  go v = do
-    putS v Grey
-    lhs <- lift $ enterVertex vis v
-    adjs <- lift $ outEdges v
-    result <- foldrM
-      (\e m -> do
-        v' <- target e
-        color <- getS v'
-        liftM (`mappend` m) $ case color of
-          White -> (liftM2 mappend) (lift $ enterEdge vis e) (go v')
-          Grey  -> lift $ grayTarget vis e
-          Black -> lift $ blackTarget vis e
-      )
-      mempty
-      adjs
-    putS v Black
-    rhs <- lift $ exitVertex vis v
-    return $ lhs `mappend` result `mappend` rhs
+dfs :: (AdjacencyListGraph g, Monoid m) => Stack (Vertex g) -> GraphSearch g m -> Vertex g -> g m
+dfs q vis v0 = graphSearch q vis v0

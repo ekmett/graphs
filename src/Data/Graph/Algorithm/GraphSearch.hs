@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.GraphSearch
--- Copyright   :  (C) 2011-2015 Edvard Kmett, Jeffrey Rosenbluth
+-- Copyright   :  (C) 2011 Edvard Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
@@ -110,8 +110,7 @@ remove ke ks = do
      then ke
      else let (a, q') = getC q in put (q', m) >> ks a
 
-graphSearch :: forall g m c.
-              (AdjacencyListGraph g, Monoid m, Container c, Monoid c, Elem c ~ Vertex g)
+graphSearch :: forall g m c. (AdjacencyListGraph g, Monoid m, Container c, Monoid c, Elem c ~ Vertex g)
             => c -> GraphSearch g m -> Vertex g -> g m
 graphSearch _ vis v0 = do
   m <- vertexMap White

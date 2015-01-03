@@ -75,11 +75,8 @@ instance (Graph g, Monoid m) => Monoid (GraphSearch g m) where
 
 class Container c where
   type Elem c :: *
-  emptyC  :: c
-  nullC   :: c -> Bool
-  getC    :: c -> (Elem c, c)
+  getC    :: c -> Maybe (Elem c, c)
   putC    :: Elem c -> c -> c
-  concatC :: c -> c -> c
 
 getS :: Monad g => k -> StateT (c, PropertyMap g k Color) g Color
 getS k = do
@@ -106,9 +103,7 @@ remove :: (Monad g, Container c)
         => StateT (c, s) g r -> (Elem c -> StateT (c, s) g r) -> StateT (c, s) g r
 remove ke ks = do
   (q, m) <- get
-  if nullC q
-     then ke
-     else let (a, q') = getC q in put (q', m) >> ks a
+  maybe ke (\q' -> put (snd q', m) >> ks (fst q')) (getC q)
 
 graphSearch :: forall g m c. (AdjacencyListGraph g, Monoid m, Container c, Monoid c, Elem c ~ Vertex g)
             => c -> GraphSearch g m -> Vertex g -> g m

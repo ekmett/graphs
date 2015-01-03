@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, ViewPatterns #-}
+{-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.BreadthFirstSearch
@@ -16,15 +16,15 @@ module Data.Graph.Algorithm.BreadthFirstSearch
   ( bfs
   ) where
 
-import Data.Sequence as S
 import Data.Monoid
+import Data.Sequence
 
 import Data.Graph.Class
 import Data.Graph.Class.AdjacencyList
 import Data.Graph.Algorithm.GraphSearch
 
 -- | Breadth first search visitor
-newtype Queue v = Queue {runQueue :: Seq v}
+newtype Queue v = Queue (Seq v)
 
 instance Monoid (Queue v) where
   mempty = Queue mempty
@@ -32,12 +32,11 @@ instance Monoid (Queue v) where
 
 instance Container (Queue v) where
   type Elem (Queue v) = v
-  emptyC = Queue empty
-  nullC (Queue q) = S.null q
-  getC (viewl . runQueue -> (a :< q)) = (a, Queue q)
-  getC _ = error "Queue is empty"
+
+  getC (Queue q)   = case viewl q of
+                       (a :< q') -> Just (a, Queue q')
+                       _         -> Nothing
   putC v (Queue q) = Queue (q |> v)
-  concatC (Queue q) (Queue q') = Queue (q >< q')
 
 bfs :: (AdjacencyListGraph g, Monoid m) => Queue (Vertex g) -> GraphSearch g m -> Vertex g -> g m
 bfs q vis v0 = graphSearch q vis v0

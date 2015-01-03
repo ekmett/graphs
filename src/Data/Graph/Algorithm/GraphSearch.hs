@@ -55,18 +55,18 @@ instance Graph g => Applicative (GraphSearch g) where
 
   m <*> n = GraphSearch
     (\v -> enterVertex m v `ap` enterVertex n v)
-    (\e -> enterEdge m e `ap`   enterEdge n e)
-    (\e -> grayTarget m e `ap`  grayTarget n e)
-    (\v -> exitVertex m v `ap`  exitVertex n v)
+    (\e -> enterEdge m e   `ap` enterEdge n e)
+    (\e -> grayTarget m e  `ap` grayTarget n e)
+    (\v -> exitVertex m v  `ap` exitVertex n v)
     (\e -> blackTarget m e `ap` blackTarget n e)
 
 instance Graph g => Monad (GraphSearch g) where
   return = pure
   m >>= f = GraphSearch
     (\v -> enterVertex m v >>= ($ v) . enterVertex . f)
-    (\e -> enterEdge m e >>= ($ e) . enterEdge . f)
-    (\e -> grayTarget m e >>= ($ e) . grayTarget . f)
-    (\v -> exitVertex m v >>= ($ v) . exitVertex . f)
+    (\e -> enterEdge m e   >>= ($ e) . enterEdge   . f)
+    (\e -> grayTarget m e  >>= ($ e) . grayTarget  . f)
+    (\v -> exitVertex m v  >>= ($ v) . exitVertex  . f)
     (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
 
 instance (Graph g, Monoid m) => Monoid (GraphSearch g m) where
@@ -75,8 +75,8 @@ instance (Graph g, Monoid m) => Monoid (GraphSearch g m) where
 
 class Container c where
   type Elem c :: *
-  getC    :: c -> Maybe (Elem c, c)
-  putC    :: Elem c -> c -> c
+  getC :: c -> Maybe (Elem c, c)
+  putC :: Elem c -> c -> c
 
 getS :: Monad g => k -> StateT (c, PropertyMap g k Color) g Color
 getS k = do

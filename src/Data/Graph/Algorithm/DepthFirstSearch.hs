@@ -36,5 +36,8 @@ instance Container (Stack v) where
   getC (Stack (x:xs)) = Just (x, Stack xs)
   putC v (Stack q)    = Stack (v : q)
 
-dfs :: (AdjacencyListGraph g, Monoid m) => Stack (Vertex g) -> GraphSearch g m -> Vertex g -> g m
-dfs q vis v0 = graphSearch q vis v0
+dfs :: (AdjacencyListGraph g, Monoid m) => GraphSearch g m -> Vertex g -> g m
+dfs vis v0 = dfs' mempty vis v0
+  where
+    dfs' :: (AdjacencyListGraph g, Monoid m) => Stack (Vertex g) -> GraphSearch g m -> Vertex g -> g m
+    dfs' q vis' v0' = graphSearch q vis' v0'

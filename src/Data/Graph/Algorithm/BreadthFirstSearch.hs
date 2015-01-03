@@ -38,5 +38,8 @@ instance Container (Queue v) where
                        _         -> Nothing
   putC v (Queue q) = Queue (q |> v)
 
-bfs :: (AdjacencyListGraph g, Monoid m) => Queue (Vertex g) -> GraphSearch g m -> Vertex g -> g m
-bfs q vis v0 = graphSearch q vis v0
+bfs :: (AdjacencyListGraph g, Monoid m) => GraphSearch g m -> Vertex g -> g m
+bfs vis v0 = bfs' mempty vis v0
+  where
+    bfs' :: (AdjacencyListGraph g, Monoid m) => Queue (Vertex g) -> GraphSearch g m -> Vertex g -> g m
+    bfs' q vis' v0' = graphSearch q vis' v0'

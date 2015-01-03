@@ -35,6 +35,7 @@ library
   exposed-modules:
     Data.Graph.AdjacencyList
     Data.Graph.AdjacencyMatrix
+    Data.Graph.Algorithm.GraphSearch
     Data.Graph.Algorithm.DepthFirstSearch
     Data.Graph.Algorithm.BreadthFirstSearch
     Data.Graph.Class

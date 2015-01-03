@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.GraphSearch
@@ -13,7 +13,7 @@
 ----------------------------------------------------------------------------
 
 module Data.Graph.Algorithm.GraphSearch
-  ( graphSearch, GraphSearch(..), Collection(..)
+  ( graphSearch, GraphSearch(..), Container(..)
   ) where
 
 import Control.Applicative
@@ -73,18 +73,14 @@ instance (Graph g, Monoid m) => Monoid (GraphSearch g m) where
   mempty = return mempty
   mappend = liftM2 mappend
 
-class Graph g => Collection g where
-  data Container g v :: *
-  emptyC  :: Container g v
-  nullC   :: Container g v -> Bool
-  getC    :: Container g v -> (v, Container g v)
-  putC    :: v -> Container g v -> Container g v
-  concatC :: Container g v -> Container g v -> Container g v
+class Container c where
+  type Elem c :: *
+  emptyC  :: c
+  nullC   :: c -> Bool
+  getC    :: c -> (Elem c, c)
+  putC    :: Elem c -> c -> c
+  concatC :: c -> c -> c
 
-instance (Collection g) => Monoid (Container g v) where
-  mempty = emptyC
-  mappend = concatC
-  
 getS :: Monad g => k -> StateT (c, PropertyMap g k Color) g Color
 getS k = do
   m <- gets snd
@@ -96,30 +92,33 @@ putS k v = do
   m' <- lift $ putP m k v
   modify $ \(q,_) -> (q, m')
 
-insert :: (Graph g, Collection g)
+insert :: (Graph g, Container c, Elem c ~ Vertex g)
         => GraphSearch g m
         -> Vertex g
-        -> StateT (Container g (Vertex g), PropertyMap g (Vertex g) Color) g m
+        -> StateT (c, PropertyMap g (Vertex g) Color) g m
 insert vis v = do
   m <- gets snd
   m' <- lift $ putP m v Grey
   modify $ \(q,_) -> (putC v q, m')
   lift $ enterVertex vis v
 
-remove :: (Monad g, Collection g)
-        => StateT (Container g v, s) g r -> (v -> StateT (Container g v, s) g r) -> StateT (Container g v, s) g r
+remove :: (Monad g, Container c)
+        => StateT (c, s) g r -> (Elem c -> StateT (c, s) g r) -> StateT (c, s) g r
 remove ke ks = do
   (q, m) <- get
   if nullC q
      then ke
      else let (a, q') = getC q in put (q', m) >> ks a
 
-graphSearch :: (AdjacencyListGraph g, Monoid m, Collection g) => GraphSearch g m -> Vertex g -> g m
-graphSearch vis v0 = do
+graphSearch :: forall g m c.
+              (AdjacencyListGraph g, Monoid m, Container c, Monoid c, Elem c ~ Vertex g)
+            => c -> GraphSearch g m -> Vertex g -> g m
+graphSearch _ vis v0 = do
   m <- vertexMap White
   evalStateT (insert vis v0 >>= pump) (mempty, m)
   where
-  pump lhs = remove (return lhs) $ \ v -> do
+  pump :: m -> StateT (c, PropertyMap g (Vertex g) Color) g m
+  pump lhs = remove (return lhs) $ \v -> do
     adjs <- lift $ outEdges v
     children <- foldrM
       (\e m -> do

@@ -31,22 +31,12 @@ import Data.Graph.Internal.Color
 import Data.Graph.Algorithm.GraphSearch
 
 -- | Breadth first search visitor
-bfs :: (AdjacencyListGraph g, Monoid m) => Bfs g m -> Vertex g -> g m
-bfs vis v0 = do
-  m <- vertexMap White
-  evalStateT (enqueue vis v0 >>= pump) (mempty, m)
-  where
-  pump lhs = dequeue (return lhs) $ \ v -> do
-    adjs <- lift $ outEdges v
-    children <- foldrM
-      (\e m -> do
-        v' <- target e
-        color <- getS v'
-        liftM (`mappend` m) $ case color of
-          White -> (liftM2 mappend) (lift $ enterEdge vis e) (enqueue vis v')
-          Grey -> lift $ grayTarget vis e
-          Black -> lift $ blackTarget vis e
-      ) mempty adjs
-    putS v Black
-    rhs <- lift $ exitVertex vis v
-    pump $ lhs `mappend` children `mappend` rhs
+newtype Bfs g m = Bfs (GraphSearch g m)
+
+-- class Graph g => Collection g where
+--   data Container g v :: *
+--   emptyC  :: Container g v
+--   nullC   :: Container g v -> Bool
+--   getC    :: Container g v -> (v, Container g v)
+--   putC    :: v -> Container g v -> Container g v
+--   concatC :: Container g v -> Container g v -> Container g v

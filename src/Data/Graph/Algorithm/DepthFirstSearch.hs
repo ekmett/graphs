@@ -32,9 +32,11 @@ instance Monoid (Stack v) where
 instance Container (Stack v) where
   type Elem (Stack v) = v
 
-  getC (Stack [])     = Nothing
-  getC (Stack (x:xs)) = Just (x, Stack xs)
-  putC v (Stack q)    = Stack (v : q)
+  peekC (Stack [])     = Nothing
+  peekC (Stack (x:_))  = Just x
+  getC  (Stack [])     = Nothing
+  getC  (Stack (x:xs)) = Just (x, Stack xs)
+  putC v (Stack q)     = Stack (v : q)
 
 dfs :: (AdjacencyListGraph g, Monoid m) => GraphSearch g m -> Vertex g -> g m
 dfs vis v0 = dfs' mempty vis v0

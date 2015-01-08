@@ -33,6 +33,10 @@ instance Monoid (Queue v) where
 instance Container (Queue v) where
   type Elem (Queue v) = v
 
+  peekC (Queue q)  = case viewl q of
+                       (a :< _) -> Just a
+                       _        -> Nothing
+
   getC (Queue q)   = case viewl q of
                        (a :< q') -> Just (a, Queue q')
                        _         -> Nothing

@@ -75,8 +75,9 @@ instance (Graph g, Monoid m) => Monoid (GraphSearch g m) where
 
 class Container c where
   type Elem c :: *
-  getC :: c -> Maybe (Elem c, c)
-  putC :: Elem c -> c -> c
+  peekC :: c -> Maybe (Elem c)
+  getC  :: c -> Maybe (Elem c, c)
+  putC  :: Elem c -> c -> c
 
 getS :: Monad g => k -> StateT (c, PropertyMap g k Color) g Color
 getS k = do
@@ -105,6 +106,12 @@ remove ke ks = do
   (q, m) <- get
   maybe ke (\q' -> put (snd q', m) >> ks (fst q')) (getC q)
 
+peek :: (Monad g, Container c)
+        => StateT (c, s) g r -> (Elem c -> StateT (c, s) g r) -> StateT (c, s) g r
+peek ke ks = do
+  (q, _) <- get
+  maybe ke (\e -> ks e) (peekC q)
+
 graphSearch :: forall g m c. (AdjacencyListGraph g, Monoid m, Container c, Monoid c, Elem c ~ Vertex g)
             => c -> GraphSearch g m -> Vertex g -> g m
 graphSearch _ vis v0 = do
@@ -112,17 +119,13 @@ graphSearch _ vis v0 = do
   evalStateT (insert vis v0 >>= pump) (mempty, m)
   where
   pump :: m -> StateT (c, PropertyMap g (Vertex g) Color) g m
-  pump lhs = remove (return lhs) $ \v -> do
+  pump lhs = peek (return lhs) $ \v -> do
     adjs <- lift $ outEdges v
-    children <- foldrM
-      (\e m -> do
-        v' <- target e
-        color <- getS v'
-        liftM (`mappend` m) $ case color of
-          White -> (liftM2 mappend) (lift $ enterEdge vis e) (insert vis v')
-          Grey -> lift $ grayTarget vis e
-          Black -> lift $ blackTarget vis e
-      ) mempty adjs
-    putS v Black
-    rhs <- lift $ exitVertex vis v
-    pump $ lhs `mappend` children `mappend` rhs
+    cs <- mapM target adjs
+    ds <- filterM (\x -> getS x >>= \c -> return (c == White)) cs
+    child <- case ds of
+      (v':_) -> insert vis v' -- need to run enterEdge
+      []     -> remove (return lhs) $ \u -> do
+        putS u Black
+        lift $ exitVertex vis u
+    pump $ lhs `mappend` child

@@ -13,7 +13,7 @@
 ----------------------------------------------------------------------------
 
 module Data.Graph.Algorithm.BreadthFirstSearch
-  ( bfs, GraphSearch(..)
+  ( bfs
   ) where
 
 import Control.Monad

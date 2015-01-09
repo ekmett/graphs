@@ -13,7 +13,7 @@
 ----------------------------------------------------------------------------
 
 module Data.Graph.Algorithm.DepthFirstSearch
-  ( dfs, GraphSearch(..)
+  ( dfs
   ) where
 
 import Control.Monad

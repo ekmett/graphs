@@ -96,7 +96,7 @@ dfs vis v0 = do
       (\e m -> do
         v' <- target e
         color <- getS v'
-        liftM (`mappend` m) $ case color of
+        liftM (m `mappend`) $ case color of
           White -> (liftM2 mappend) (lift $ enterEdge vis e) (go v')
           Grey  -> lift $ grayTarget vis e
           Black -> lift $ blackTarget vis e

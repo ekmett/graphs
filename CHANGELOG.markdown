@@ -1,3 +1,8 @@
+0.6
+---
+* Fixed the `dfs` `enterVertex` and `exitVertex` order, they were wrong before.
+* Factored out a common visitor model for both `bfs` and `dfs`.
+
 0.5
 ---
 * Added `enterEdge` to `bfs` and `dfs`.

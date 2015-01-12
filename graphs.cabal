@@ -11,7 +11,70 @@ homepage:      http://github.com/ekmett/graphs
 bug-reports:   http://github.com/ekmett/graphs/issues
 copyright:     Copyright (C) 2011-2013 Edward A. Kmett
 synopsis:      A simple monadic graph library
-description:   A simple monadic graph library
+description:
+  A \"not-very-Haskelly\" API for calculating traversals of graphs that may be too large to fit into memory.
+  The algorithms included are inspired by the visitor concept of the
+  <http://www.boost.org/doc/libs/1_57_0/libs/graph/doc/visitor_concepts.html Boost Graph Library>.
+  .
+  Here is a very simple example of how we might execute a depth-first-search. In this case the visitor simply collects the edges and vertices in the order that the corresponding functions get called. After the necessary imports,
+  .
+  > import Data.Array
+  > import Data.Monoid
+  > import Data.Graph.AdjacencyList
+  > import Data.Graph.Algorithm
+  > import Data.Graph.Algorithm.DepthFirstSearch
+  . 
+  create an adjacency list where the vertices are labeled with integers.
+  .
+  > graph :: Array Int [Int]
+  > graph = array (0, 3) [(0, [1,2]), (1, [3]), (2, [3]), (3, [])]
+  .
+  <<http://i.imgur.com/Pod1SH0.png>>
+  .
+  We need a data structure that instantiates `Monoid` to combine the results of
+  our visitor functions.
+  .
+  @
+    data Orderings = Orderings
+      &#32;&#32;&#123;&#32;&#32;enterV :: [Int]
+      &#32;&#32;,  enterE :: [(Int, Int)]
+      &#32;&#32;,  gray   :: [(Int, Int)]
+      &#32;&#32;,  exitV  :: [Int]
+      &#32;&#32;,  black  :: [(Int, Int)]
+      &#32;&#32;&#125;&#32;deriving Show
+    . 
+    instance Monoid Orderings where
+      &#32;mempty = Orderings [] [] [] [] []
+      &#32;mappend (Orderings a1 a2 a3 a4 a5)(Orderings b1 b2 b3 b4 b5) =
+      &#32;&#32;Orderings (a1 ++ b1) (a2 ++ b2) (a3 ++ b3) (a4 ++ b4) (a5 ++ b5)
+  @
+  . 
+  The `dfs` function's first argument is of type `GraphSearch` which is
+  a visitor containing the functions to be run at various times during the search.
+  The second argument is the starting vertex for the search.
+  .
+  @
+    orderings :: GraphSearch (AdjacencyList Int) Orderings
+    orderings = GraphSearch
+      &#32;&#32;(\v -> return $ mempty &#123;enterV = [v]&#125;
+      &#32;&#32;(\e -> return $ mempty &#123;enterE = [e]&#125;
+      &#32;&#32;(\e -> return $ mempty &#123;gray   = [e]&#125;
+      &#32;&#32;(\v -> return $ mempty &#123;exitV  = [v]&#125;
+      &#32;&#32;(\e -> return $ mempty &#123;black  = [e]&#125;
+  @
+  .   
+  Finally `runAdjacencylist` unwraps the function in the `Adjacencylist` newtype and runs
+  it on `graph`.
+  .
+  > dfsTest :: Orderings
+  > dfsTest = runAdjacencyList (dfs orderings 0) graph
+  .
+  Running `dfsTest` in ghci will yield:
+  .
+  @
+    Orderings &#123;enterV = [0,2,3,1], enterE = [(0,2),(2,3),(0,1)], gray = [], exitV = [3,2,1,0], black = [(1,3)]&#125;
+  @
+
 build-type:    Simple
 
 extra-source-files: .travis.yml CHANGELOG.markdown README.markdown

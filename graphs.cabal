@@ -1,6 +1,6 @@
 name:          graphs
 category:      Algorithms, Data Structures, Graphs
-version:       0.6.1
+version:       0.7
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE

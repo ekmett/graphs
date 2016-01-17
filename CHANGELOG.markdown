@@ -1,3 +1,7 @@
+0.7
+---
+* Build warning-free on GHC 7.10 and GHC 8.0-rc1
+
 0.6
 ---
 * Fixed the `dfs` `enterVertex` and `exitVertex` order, they were wrong before.

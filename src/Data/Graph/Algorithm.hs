@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE CPP, TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm
@@ -16,9 +16,11 @@ module Data.Graph.Algorithm
   ( GraphSearch(..)
   ) where
 
-import Control.Applicative
 import Control.Monad
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative
 import Data.Monoid
+#endif
 
 import Data.Graph.Class
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, FlexibleInstances #-}
+{-# LANGUAGE CPP, TypeFamilies, FlexibleInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class.AdjacencyList
@@ -30,7 +30,9 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Error
 import Control.Monad.Trans.Reader
 import Data.Functor.Identity
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
+#endif
 import Data.Graph.Class
 
 defaultOutEdges :: AdjacencyListGraph g => Vertex g -> g [(Vertex g, Vertex g)]

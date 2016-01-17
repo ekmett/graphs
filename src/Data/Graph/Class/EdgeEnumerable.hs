@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
+{-# LANGUAGE CPP, TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class.EdgeEnumerable
@@ -28,7 +28,9 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Error
 import Control.Monad.Trans.Class
 import Data.Functor.Identity
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
+#endif
 import Data.Graph.Class
 
 class Graph g => EdgeEnumerableGraph g where

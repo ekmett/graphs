@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
+{-# LANGUAGE CPP, TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Adjacency.Matrix
@@ -17,7 +17,9 @@ module Data.Graph.AdjacencyMatrix
   , ask
   ) where
 
+#if __GLASGOW_HASKELL__ < 710
 import Control.Applicative
+#endif
 import Data.Ix
 import Data.Array.IArray
 import Data.Graph.PropertyMap

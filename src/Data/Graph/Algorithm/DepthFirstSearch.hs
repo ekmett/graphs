@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE CPP, TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.DepthFirstSearch
@@ -20,7 +20,9 @@ import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.State.Strict
 import Data.Foldable
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
+#endif
 
 import Data.Graph.Algorithm
 import Data.Graph.Class

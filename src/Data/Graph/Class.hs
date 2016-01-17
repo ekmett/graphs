@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
+{-# LANGUAGE CPP, TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class
@@ -32,7 +32,9 @@ import Control.Monad.Trans.Error
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Class
 import Data.Functor.Identity
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
+#endif
 import Data.Graph.PropertyMap
 import Data.Void
 

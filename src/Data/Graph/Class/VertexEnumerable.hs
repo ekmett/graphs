@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
+{-# LANGUAGE CPP, TypeFamilies, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class.VertexEnumerable
@@ -27,7 +27,9 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Error
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.Reader
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
+#endif
 import Data.Graph.Class
 import Data.Functor.Identity
 

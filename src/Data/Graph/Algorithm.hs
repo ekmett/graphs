@@ -26,11 +26,11 @@ import Data.Graph.Class
 
 -- | Graph search visitor
 data GraphSearch g m = GraphSearch
-  { enterVertex :: Vertex g -> g m -- called the first time a vertex is discovered
-  , enterEdge   :: Edge g   -> g m -- called the first time an edge is discovered, before enterVertex
-  , grayTarget  :: Edge g   -> g m -- called when we encounter a back edge to a vertex we're still processing
-  , exitVertex  :: Vertex g -> g m -- called once we have processed all descendants of a vertex
-  , blackTarget :: Edge g   -> g m -- called when we encounter a cross edge to a vertex we've already finished
+  { enterVertex :: Vertex g -> g m -- ^ Called the first time a vertex is discovered
+  , enterEdge   :: Edge g   -> g m -- ^ Called the first time an edge is discovered, before enterVertex
+  , grayTarget  :: Edge g   -> g m -- ^ Called when we encounter a back edge to a vertex we're still processing
+  , exitVertex  :: Vertex g -> g m -- ^ Called once we have processed all descendants of a vertex
+  , blackTarget :: Edge g   -> g m -- ^ Called when we encounter a cross edge to a vertex we've already finished
   }
 
 instance Graph g => Functor (GraphSearch g) where

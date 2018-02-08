@@ -19,7 +19,10 @@ module Data.Graph.Algorithm
 import Control.Monad
 #if __GLASGOW_HASKELL__ < 710
 import Control.Applicative
-import Data.Monoid
+import Data.Monoid (Monoid(..))
+#endif
+#if !(MIN_VERSION_base(4,11,0))
+import Data.Semigroup (Semigroup(..))
 #endif
 
 import Data.Graph.Class
@@ -65,6 +68,11 @@ instance Graph g => Monad (GraphSearch g) where
     (\v -> exitVertex m v >>= ($ v)  . exitVertex . f)
     (\e -> blackTarget m e >>= ($ e) . blackTarget . f)
 
+instance (Graph g, Semigroup m) => Semigroup (GraphSearch g m) where
+  (<>) = liftM2 (<>)
+
 instance (Graph g, Monoid m) => Monoid (GraphSearch g m) where
   mempty = return mempty
+#if !(MIN_VERSION_base(4,11,0))
   mappend = liftM2 mappend
+#endif

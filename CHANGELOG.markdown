@@ -1,3 +1,7 @@
+next
+----
+* Add a `Semigroup` instance for `GraphSearch`.
+
 0.7
 ---
 * Build warning-free on GHC 7.10 and GHC 8.0-rc1

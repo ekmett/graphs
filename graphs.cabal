@@ -23,7 +23,7 @@ description:
   > import Data.Graph.AdjacencyList
   > import Data.Graph.Algorithm
   > import Data.Graph.Algorithm.DepthFirstSearch
-  . 
+  .
   create an adjacency list where the vertices are labeled with integers.
   .
   > graph :: Array Int [Int]
@@ -42,13 +42,13 @@ description:
       &#32;&#32;,  exitV  :: [Int]
       &#32;&#32;,  black  :: [(Int, Int)]
       &#32;&#32;&#125;&#32;deriving Show
-    . 
+    .
     instance Monoid Orderings where
       &#32;mempty = Orderings [] [] [] [] []
       &#32;mappend (Orderings a1 a2 a3 a4 a5)(Orderings b1 b2 b3 b4 b5) =
       &#32;&#32;Orderings (a1 ++ b1) (a2 ++ b2) (a3 ++ b3) (a4 ++ b4) (a5 ++ b5)
   @
-  . 
+  .
   The `dfs` function's first argument is of type `GraphSearch` which is
   a visitor containing the functions to be run at various times during the search.
   The second argument is the starting vertex for the search.
@@ -62,7 +62,7 @@ description:
       &#32;&#32;(\\v -> return $ mempty &#123;exitV  = [v]&#125;)
       &#32;&#32;(\\e -> return $ mempty &#123;black  = [e]&#125;)
   @
-  .   
+  .
   Finally `runAdjacencylist` unwraps the function in the `Adjacencylist` newtype and runs
   it on `graph`.
   .
@@ -95,6 +95,10 @@ library
     transformers-compat >= 0.3 && < 1,
     containers   >= 0.3     && < 0.6,
     void         >= 0.5.5.1 && < 1
+
+  if !impl(ghc >= 8.0)
+    build-depends:
+      semigroups >= 0.16    && < 1
 
   exposed-modules:
     Data.Graph.AdjacencyList

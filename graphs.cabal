@@ -56,11 +56,11 @@ description:
   @
     orderings :: GraphSearch (AdjacencyList Int) Orderings
     orderings = GraphSearch
-      &#32;&#32;(\v -> return $ mempty &#123;enterV = [v]&#125;
-      &#32;&#32;(\e -> return $ mempty &#123;enterE = [e]&#125;
-      &#32;&#32;(\e -> return $ mempty &#123;gray   = [e]&#125;
-      &#32;&#32;(\v -> return $ mempty &#123;exitV  = [v]&#125;
-      &#32;&#32;(\e -> return $ mempty &#123;black  = [e]&#125;
+      &#32;&#32;(\\v -> return $ mempty &#123;enterV = [v]&#125;)
+      &#32;&#32;(\\e -> return $ mempty &#123;enterE = [e]&#125;)
+      &#32;&#32;(\\e -> return $ mempty &#123;gray   = [e]&#125;)
+      &#32;&#32;(\\v -> return $ mempty &#123;exitV  = [v]&#125;)
+      &#32;&#32;(\\e -> return $ mempty &#123;black  = [e]&#125;)
   @
   .   
   Finally `runAdjacencylist` unwraps the function in the `Adjacencylist` newtype and runs

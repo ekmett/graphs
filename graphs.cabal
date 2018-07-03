@@ -85,6 +85,7 @@ tested-with:   GHC == 7.0.4
              , GHC == 8.0.2
              , GHC == 8.2.2
              , GHC == 8.4.3
+             , GHC == 8.6.1
 
 extra-source-files: .travis.yml CHANGELOG.markdown README.markdown
 
@@ -102,7 +103,7 @@ library
     array        >= 0.3     && < 0.7,
     transformers >= 0.2.2   && < 0.6,
     transformers-compat >= 0.3 && < 1,
-    containers   >= 0.3     && < 0.6,
+    containers   >= 0.3     && < 0.7,
     void         >= 0.5.5.1 && < 1
 
   if !impl(ghc >= 8.0)

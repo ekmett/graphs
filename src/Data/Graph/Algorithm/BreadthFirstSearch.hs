@@ -23,7 +23,7 @@ import Data.Foldable
 #if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
 #endif
-import Data.Sequence
+import Data.Sequence (Seq(..), ViewL(..), (|>), viewl)
 
 import Data.Graph.Algorithm
 import Data.Graph.Class

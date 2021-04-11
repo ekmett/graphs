@@ -43,9 +43,11 @@ instance Applicative g => Applicative (Dual g) where
   Dual f  *> Dual a = Dual (f  *> a)
 
 instance Monad g => Monad (Dual g) where
-  return = Dual . return
   Dual g >>= k = Dual (g >>= runDual . k)
+#if !(MIN_VERSION_base(4,11,0))
+  return = Dual . return
   Dual g >> Dual h = Dual (g >> h)
+#endif
 
 instance Graph g => Graph (Dual g) where
   type Vertex (Dual g) = Vertex g

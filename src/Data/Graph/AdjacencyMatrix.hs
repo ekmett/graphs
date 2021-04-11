@@ -40,7 +40,9 @@ instance Applicative (AdjacencyMatrix arr i) where
   AdjacencyMatrix f <*> AdjacencyMatrix a = AdjacencyMatrix $ \t -> f t (a t)
 
 instance Monad (AdjacencyMatrix arr i) where
+#if !(MIN_VERSION_base(4,11,0))
   return = AdjacencyMatrix . const
+#endif
   AdjacencyMatrix f >>= k = AdjacencyMatrix $ \t -> runAdjacencyMatrix (k (f t)) t
 
 instance Ord i => Graph (AdjacencyMatrix arr i) where

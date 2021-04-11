@@ -40,7 +40,9 @@ instance Applicative (AdjacencyList i) where
   AdjacencyList f <*> AdjacencyList a = AdjacencyList $ \t -> f t (a t)
 
 instance Monad (AdjacencyList i) where
+#if !(MIN_VERSION_base(4,11,0))
   return = AdjacencyList . const
+#endif
   AdjacencyList f >>= k = AdjacencyList $ \t -> runAdjacencyList (k (f t)) t
 
 instance Ord i => Graph (AdjacencyList i) where

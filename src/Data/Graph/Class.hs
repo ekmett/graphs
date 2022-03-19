@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, TypeFamilies, FlexibleContexts #-}
+{-# LANGUAGE CPP, TypeFamilies, TypeOperators, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Class

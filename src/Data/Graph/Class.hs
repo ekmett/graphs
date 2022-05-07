@@ -28,7 +28,9 @@ import qualified Control.Monad.Trans.RWS.Strict as Strict
 import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import Control.Monad.Trans.Identity
 import Control.Monad.Trans.Maybe
+#if !(MIN_VERSION_transformers(0,6,0))
 import Control.Monad.Trans.Error
+#endif
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Class
 import Data.Functor.Identity
@@ -99,11 +101,13 @@ instance Graph g => Graph (MaybeT g) where
   vertexMap = liftVertexMap
   edgeMap = liftEdgeMap
 
+#if !(MIN_VERSION_transformers(0,6,0))
 instance (Graph g, Error e) => Graph (ErrorT e g) where
   type Vertex (ErrorT e g) = Vertex g
   type Edge (ErrorT e g) = Edge g
   vertexMap = liftVertexMap
   edgeMap = liftEdgeMap
+#endif
 
 instance (Graph g, Monoid w) => Graph (Lazy.RWST r w s g) where
   type Vertex (Lazy.RWST r w s g) = Vertex g

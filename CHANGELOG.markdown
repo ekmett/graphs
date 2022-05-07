@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Allow building with `transformers-0.6.*`.
+
 0.7.1 [2018.02.24]
 ------------------
 * Add a `Semigroup` instance for `GraphSearch`.

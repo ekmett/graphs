@@ -25,7 +25,9 @@ import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Identity
+#if !(MIN_VERSION_transformers(0,6,0))
 import Control.Monad.Trans.Error
+#endif
 import Control.Monad.Trans.Class
 import Data.Functor.Identity
 #if __GLASGOW_HASKELL__ < 710
@@ -57,8 +59,10 @@ instance (AdjacencyMatrixGraph g, Monoid m) => AdjacencyMatrixGraph (Lazy.RWST r
 instance AdjacencyMatrixGraph g => AdjacencyMatrixGraph (MaybeT g) where
   edge a b = lift (edge a b)
 
+#if !(MIN_VERSION_transformers(0,6,0))
 instance (AdjacencyMatrixGraph g, Error e) => AdjacencyMatrixGraph (ErrorT e g) where
   edge a b = lift (edge a b)
+#endif
 
 instance AdjacencyMatrixGraph g => AdjacencyMatrixGraph (IdentityT g) where
   edge a b = lift (edge a b)

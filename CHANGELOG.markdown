@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Drop support for pre-8.0 versions of GHC.
+
 0.7.2 [2022.05.07]
 ------------------
 * Allow building with `transformers-0.6.*`.

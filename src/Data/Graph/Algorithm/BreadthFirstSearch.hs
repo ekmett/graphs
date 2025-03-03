@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, TypeFamilies #-}
+{-# LANGUAGE TypeFamilies #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Graph.Algorithm.BreadthFirstSearch
@@ -20,9 +20,6 @@ import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.State.Strict
 import Data.Foldable
-#if __GLASGOW_HASKELL__ < 710
-import Data.Monoid
-#endif
 import Data.Sequence (Seq(..), ViewL(..), (|>), viewl)
 
 import Data.Graph.Algorithm

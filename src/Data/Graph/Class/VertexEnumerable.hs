@@ -29,9 +29,6 @@ import Control.Monad.Trans.Error
 #endif
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.Reader
-#if __GLASGOW_HASKELL__ < 710
-import Data.Monoid
-#endif
 import Data.Graph.Class
 import Data.Functor.Identity
 

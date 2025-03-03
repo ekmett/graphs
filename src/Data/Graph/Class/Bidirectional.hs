@@ -31,9 +31,6 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Error
 #endif
 import Data.Functor.Identity
-#if __GLASGOW_HASKELL__ < 710
-import Data.Monoid
-#endif
 import Data.Graph.Class.AdjacencyList
 
 class AdjacencyListGraph g => BidirectionalGraph g where
